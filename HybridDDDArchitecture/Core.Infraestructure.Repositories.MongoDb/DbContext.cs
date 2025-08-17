@@ -10,6 +10,7 @@ namespace Core.Infraestructure.Repositories.MongoDb
 
         protected DbContext(string connectionString)
         {
+            MongoClientSettings settings =  MongoClientSettings.FromConnectionString(connectionString ?? throw new ArgumentNullException(nameof(connectionString)));
 
             MongoUrl url = new MongoUrl(connectionString ?? throw new ArgumentNullException(nameof(connectionString)));
             MongoClient client = new MongoClient(url);

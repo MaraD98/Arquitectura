@@ -7,7 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Core.Application.Adapters\Core.Application.Adapters.Http.csproj" />
 		<ProjectReference Include="..\Core.Application.ComandQueryBus\Core.Application.ComandQueryBus.csproj" />
+		<ProjectReference Include="..\Core.Application.EventBus\Core.Application.EventBus.csproj" />
 		<ProjectReference Include="..\Core.Application.Mapping\Core.Application.Mapping.csproj" />
 		<ProjectReference Include="..\Core.Application.Repositories\Core.Application.Repositories.csproj" />
 		<ProjectReference Include="..\Domain\Domain.csproj" />
@@ -15,13 +17,10 @@
 
 	<ItemGroup>
 		<Folder Include="Adapters\" />
-		<Folder Include="Integrations\Events\" />
-		<Folder Include="Integrations\Handlers\" />
-		<Folder Include="UseCases\DummyEntity\Notifications\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
 	</ItemGroup>
 
 </Project>

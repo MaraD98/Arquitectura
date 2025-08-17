@@ -10,8 +10,8 @@ namespace Application.DomainEvents
     internal sealed class DummyEntityCreated : DomainEvent
     {
         //Aqui se definen las propiedades compartidas en el evento
-        public int DummyIdProperty { get; set; }
-        public string DummyPropertyTwo { get; set; }
-        public DummyValues DummyPropertyThree { get; set; }
+        public string Id { get; set; }
+        public string DummyPropertyOne { get; set; }
+        public DummyValues DummyPropertyTwo { get; set; }
     }
 }

@@ -13,8 +13,8 @@ namespace Application.UseCases.DummyEntity.Commands.CreateDummyEntity
     public class CreateDummyEntityCommand : IRequestCommand<string>
     {
         [Required]
-        public string DummyPropertyTwo { get; set; }
-        public DummyValues DummyPropertyThree { get; set; }
+        public string dummyPropertyOne { get; set; }
+        public DummyValues dummyPropertyTwo { get; set; }
 
         public CreateDummyEntityCommand()
         {

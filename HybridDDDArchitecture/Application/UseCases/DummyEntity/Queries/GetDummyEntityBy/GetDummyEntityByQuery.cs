@@ -7,7 +7,7 @@ namespace Application.UseCases.DummyEntity.Queries.GetDummyEntityBy
     public class GetDummyEntityByQuery : IRequestQuery<DummyEntityDto>
     {
         [Required]
-        public int DummyIdProperty { get; set; }
+        public string DummyIdProperty { get; set; }
 
         public GetDummyEntityByQuery()
         {

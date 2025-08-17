@@ -1,4 +1,5 @@
-﻿using Application.Registrations;
+﻿using Application;
+using Application.Registrations;
 using AutoMapper;
 using Core.Application;
 using Filters;
@@ -57,13 +58,16 @@ namespace API
             app.UseCors("AllowSpecificOrigin");
             app.UseAuthentication();
             app.UseAuthorization();
-            //UseEventBus(app);
+            UseEventBus(app);
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
 
-        //private void UseEventBus(IApplicationBuilder app)
-        //{
-        //    var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
-        //}
+        private void UseEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            // Aqui se registran las subscripciones a eventos del bus de eventos, vinculando
+            //eventos con sus respectivos handlers
+            eventBus.Subscribe<DummyEntityCreatedIntegrationEvent, DummyEntityCreatedIntegrationEventHandlerSub>();
+        }
     }
 }

@@ -29,9 +29,9 @@ namespace Controllers
         }
 
         [HttpGet("api/v1/[Controller]/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id)
         {
-            if (id <= 0) return BadRequest();
+            if (string.IsNullOrEmpty(id)) return BadRequest();
 
             var entity = await _commandQueryBus.Send(new GetDummyEntityByQuery { DummyIdProperty = id });
 

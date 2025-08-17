@@ -15,8 +15,8 @@ namespace ESCMB.Application.UseCases.DummyEntity.Commands.UpdateDummyEntity
         public async Task Handle(UpdateDummyEntityCommand request, CancellationToken cancellationToken)
         {
             Domain.Entities.DummyEntity entity = await _context.FindOneAsync(request.DummyIdProperty) ?? throw new EntityDoesNotExistException();
-            entity.SetDummyPropertyTwo(request.DummyPropertyTwo);
-            entity.SetDummyPropertyThree(request.DummyPropertyThree);
+            entity.SetdummyPropertyOne(request.dummyPropertyOne);
+            entity.SetdummyPropertyTwo(request.dummyPropertyTwo);
 
             try
             {

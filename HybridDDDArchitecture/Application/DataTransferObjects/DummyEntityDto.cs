@@ -1,7 +1,10 @@
-﻿namespace Application.DataTransferObjects
+﻿using static Domain.Enums.Enums;
+
+namespace Application.DataTransferObjects
 {
     public class DummyEntityDto
     {
-        public int DummyIdProperty { get; set; }
+        public string DummyPropertyOne { get; private set; }
+        public DummyValues DummyPropertyTwo { get; private set; }
     }
 }

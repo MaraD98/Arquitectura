@@ -14,13 +14,8 @@ namespace Infrastructure.Repositories.Mongo.Maps
             {
                 BsonClassMap.RegisterClassMap((BsonClassMap<DummyEntity> c) =>
                 {
-                    c.MapIdMember(p => p.Id)
-                     .SetIdGenerator(StringObjectIdGenerator.Instance)
-                     .SetSerializer(new StringSerializer(BsonType.ObjectId));
-
-                    c.SetIgnoreExtraElements(true);
-
                     c.AutoMap();
+                    c.SetIgnoreExtraElements(true);
                 });
             }
         }

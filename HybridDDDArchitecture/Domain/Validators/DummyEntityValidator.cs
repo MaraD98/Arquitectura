@@ -15,7 +15,7 @@ namespace Domain.Validators
         public DummyEntityValidator()
         {
             //Las reglas de negocio deben ir definidas aca
-            RuleFor(x => x.DummyPropertyTwo).NotNull().NotEmpty().WithMessage(DomainConstants.NOTNULL_OR_EMPTY);
+            RuleFor(x => x.DummyPropertyOne).NotNull().NotEmpty().WithMessage(DomainConstants.NOTNULL_OR_EMPTY);
         }
     }
 }

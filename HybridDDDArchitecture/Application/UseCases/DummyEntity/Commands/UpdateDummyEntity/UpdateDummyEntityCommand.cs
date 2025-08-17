@@ -10,8 +10,8 @@ namespace Application.UseCases.DummyEntity.Commands.UpdateDummyEntity
         [Required]
         public int DummyIdProperty { get; set; }
         [Required]
-        public string DummyPropertyTwo { get; set; }
-        public DummyValues DummyPropertyThree { get; set; }
+        public string dummyPropertyOne { get; set; }
+        public DummyValues dummyPropertyTwo { get; set; }
 
         public UpdateDummyEntityCommand()
         {

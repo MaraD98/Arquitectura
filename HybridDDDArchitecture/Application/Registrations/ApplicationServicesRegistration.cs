@@ -13,7 +13,7 @@ namespace Application.Registrations
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             /* Automapper */
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(config => config.AddMaps(Assembly.GetExecutingAssembly()));
 
             /* EventBus */
             services.AddPublishers();
@@ -32,12 +32,14 @@ namespace Application.Registrations
         private static IServiceCollection AddPublishers(this IServiceCollection services)
         {
             //Aqui se registran los handlers que publican en el bus de eventos
+            services.AddTransient<IIntegrationEventHandler<DummyEntityCreatedIntegrationEvent>, DummyEntityCreatedIntegrationEventHandlerPub>();
             return services;
         }
 
         private static IServiceCollection AddSubscribers(this IServiceCollection services)
         {
             //Aqui se registran los handlers que se suscriben al bus de eventos
+            services.AddTransient<DummyEntityCreatedIntegrationEventHandlerSub>();
             return services;
         }
     }

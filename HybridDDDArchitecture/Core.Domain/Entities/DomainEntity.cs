@@ -14,7 +14,15 @@ namespace Core.Domain.Entities
         where TValidator : IValidator, new()
     {
         public TKey Id { get; protected set; }
-        public bool IsValid => ValidationResult.IsValid;
+        public bool IsValid
+        {
+            get
+            {
+                Validate();
+                return ValidationResult.IsValid;
+            }
+        }
+
         protected TValidator Validator { get; }
         private ValidationResult ValidationResult { get; set; }
 
