@@ -1,5 +1,9 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.VisualBasic;
+using System.ComponentModel.DataAnnotations;
+using System;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace Core.Domain.Entities
 {
@@ -13,6 +17,7 @@ namespace Core.Domain.Entities
     public class DomainEntity<TKey, TValidator> : IValidate
         where TValidator : IValidator, new()
     {
+        [Key]
         public TKey Id { get; protected set; }
         public bool IsValid
         {
