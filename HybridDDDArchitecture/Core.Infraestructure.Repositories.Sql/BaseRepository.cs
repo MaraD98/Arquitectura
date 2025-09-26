@@ -82,5 +82,10 @@ namespace Core.Infraestructure.Repositories.Sql
                 Context.SaveChanges();
             }
         }
+
+        public IQueryable<TEntity> Query()
+        {
+            return Context.Set<TEntity>();
+        }
     }
 }
