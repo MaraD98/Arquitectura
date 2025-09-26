@@ -1,5 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.VisualBasic;
+using System.ComponentModel.DataAnnotations;
+using System;
+using ValidationResult = FluentValidation.Results.ValidationResult;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
@@ -13,6 +18,8 @@ namespace Core.Domain.Entities
     public class DomainEntity<TKey, TValidator> : IValidate
         where TValidator : IValidator, new()
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] //Decorador para que sea autoincremental
         public TKey Id { get; protected set; }
         public bool IsValid
         {
