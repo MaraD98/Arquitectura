@@ -58,7 +58,7 @@ namespace Core.Infraestructure.Repositories.Sql
 
         public async Task<TEntity> FindOneAsync(params object[] keyValues)
         {
-            return await Repository.FindAsync(keyValues);
+            return await Repository.FindAsync(keyValues); //parecido o igual al GetByIdAsync
         }
 
         public void Remove(params object[] keyValues)
@@ -87,5 +87,17 @@ namespace Core.Infraestructure.Repositories.Sql
         {
             return Context.Set<TEntity>();
         }
+
+        public async Task<TEntity> GetByIdAsync(int id)
+        {
+            return await FindOneAsync(id);
+        }
+
+        public async Task DeleteAsync(TEntity entity)
+        {
+            Repository.Remove(entity);
+            await Context.SaveChangesAsync();
+        }
+
     }
 }

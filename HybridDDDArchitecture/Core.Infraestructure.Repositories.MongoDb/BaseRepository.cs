@@ -80,5 +80,16 @@ namespace Core.Infraestructure.Repositories.MongoDb
         {
             throw new NotImplementedException("Query() no está implementado para MongoDb.");
         }
+
+        public Task<TEntity> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException("GetByIdAsync() no está implementado para MongoDb.");
+        }
+
+        public Task DeleteAsync(TEntity entity)
+        {
+            throw new NotImplementedException("DeleteAsync() no está implementado para MongoDb.");
+        }
+
     }
 }

@@ -9,11 +9,11 @@ namespace Application.DomainEvents
 {
     internal class AutomovilEliminado : DomainEvent
     {
-        public int DummyIdProperty { get; set; }
+        public int AutomovilId { get; set; }
 
         public AutomovilEliminado(int id)
         {
-            DummyIdProperty = id;
+            AutomovilId = id;
         }
     }
 }

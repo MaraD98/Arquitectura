@@ -17,6 +17,9 @@ namespace Application.UseCases.Automovil.Commands.DeleteAutomovil
         public DeleteAutomovilCommand()
         {
         }
-
+        //public DeleteAutomovilCommand(int automovilId) podria agregar
+        //{
+        //    AutomovilId = automovilId;
+        //}
     }
 }

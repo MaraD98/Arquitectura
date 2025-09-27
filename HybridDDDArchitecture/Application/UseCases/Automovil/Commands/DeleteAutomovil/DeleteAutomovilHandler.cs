@@ -13,21 +13,31 @@ using System.Threading.Tasks;
 
 namespace Application.UseCases.Automovil.Commands.DeleteAutomovil
 {
-    internal sealed class DeleteAutomovilHandler(ICommandQueryBus domainBus, IAutomovilRepository automovilRepository)
-         : IRequestCommandHandler<DeleteAutomovilCommand, Unit>
+    internal class DeleteAutomovilHandler : IRequestCommandHandler<DeleteAutomovilCommand, Unit>
     {
-        private readonly ICommandQueryBus _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
-        private readonly IAutomovilRepository _context = automovilRepository ?? throw new ArgumentNullException(nameof(automovilRepository));
+        private readonly ICommandQueryBus _domainBus;
+        private readonly IAutomovilRepository _automovilRepository;
 
-        public Task<Unit> Handle(DeleteAutomovilCommand request, CancellationToken cancellationToken)
+        public DeleteAutomovilHandler(ICommandQueryBus domainBus, IAutomovilRepository automovilRepository)
         {
+            _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
+            _automovilRepository = automovilRepository ?? throw new ArgumentNullException(nameof(automovilRepository));
+        }
+
+        public async Task<Unit> Handle(DeleteAutomovilCommand request, CancellationToken cancellationToken)
+        {
+            var automovil = await _automovilRepository.GetByIdAsync(request.AutomovilId);
+
+            if (automovil is null)
+                throw new EntityDoesNotExistException();
+
             try
             {
-                _context.Remove(request.AutomovilId);
+                await _automovilRepository.DeleteAsync(automovil);
 
-                _domainBus.Publish(new AutomovilEliminado(request.AutomovilId), cancellationToken);
+                await _domainBus.Publish(automovil.To<AutomovilEliminado>(), cancellationToken);
 
-                return Unit.Task;
+                return Unit.Value;
             }
             catch (Exception ex)
             {
@@ -36,3 +46,4 @@ namespace Application.UseCases.Automovil.Commands.DeleteAutomovil
         }
     }
 }
+
