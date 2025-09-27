@@ -17,6 +17,7 @@ namespace Application.Mappings
             CreateMap<DummyEntity, DummyEntityDto>().ReverseMap();
 
             CreateMap<Automovil, AutomovilCreado>().ReverseMap();
+            CreateMap<Automovil, AutomovilEliminado>().ReverseMap();
         }
     }
 }
