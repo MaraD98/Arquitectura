@@ -23,7 +23,11 @@ namespace Controllers
 
             var id = await _commandQueryBus.Send(command);
 
-            return Created($"api/v1/[controller]/{id}", new { Id = id });
+            return Created($"api/v1/[controller]/{id}", new
+            {
+                Id = id,
+                mensaje = "Automovil creado correctamente"
+            });
         }
 
         [HttpDelete("api/v1/[controller]/{id}")]
@@ -33,7 +37,7 @@ namespace Controllers
 
             await _commandQueryBus.Send(new DeleteAutomovilCommand { AutomovilId = id });
 
-            return NoContent();
+            return Ok(new { mensaje = "Automovil eliminado correctamente" });
         }
     }
 }
