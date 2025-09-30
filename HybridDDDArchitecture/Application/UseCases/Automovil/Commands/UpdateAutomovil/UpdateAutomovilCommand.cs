@@ -1,6 +1,5 @@
 ﻿using Core.Application;
-using System;
-using System.Collections.Generic;
+
 
 
 namespace Application.UseCases.Automovil.Commands.UpdateAutomovil
@@ -12,7 +11,6 @@ namespace Application.UseCases.Automovil.Commands.UpdateAutomovil
         public string Color { get; set; }
         public int? Fabricacion { get; set; }
         public string NumeroMotor { get; set; }
-        public string NumeroChasis { get; set; }
         public UpdateAutomovilCommand()
         {
         }

@@ -55,32 +55,52 @@ namespace Domain.Entities
             return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
         }
 
-        public void Actualizar(
-            string marca,
-            string modelo,
-            string color,
-            int? fabricacion,
-            string numeroMotor,
-            string numeroChasis)
+        public List<string> Actualizar(
+        string marca,
+        string modelo,
+        string color,
+        int? fabricacion,
+        string numeroMotor)
         {
+            var camposActualizados = new List<string>();
 
-            if (!string.IsNullOrWhiteSpace(marca))
+            if (!string.IsNullOrWhiteSpace(marca) && marca != Marca)
+            {
                 Marca = marca;
+                camposActualizados.Add(nameof(Marca));
+            }
 
-            if (!string.IsNullOrWhiteSpace(modelo))
+            if (!string.IsNullOrWhiteSpace(modelo) && modelo != Modelo)
+            {
                 Modelo = modelo;
+                camposActualizados.Add(nameof(Modelo));
+            }
 
-            if (!string.IsNullOrWhiteSpace(color))
+            if (!string.IsNullOrWhiteSpace(color) && color != Color)
+            {
                 Color = color;
+                camposActualizados.Add(nameof(Color));
+            }
 
-            if (fabricacion is not null && fabricacion >= 1995 && fabricacion <= DateTime.Now.Year)
+            if (fabricacion is not null && fabricacion >= 1995 && fabricacion <= DateTime.Now.Year && fabricacion != Fabricacion)
+            {
                 Fabricacion = fabricacion.Value;
+                camposActualizados.Add(nameof(Fabricacion));
+            }
 
-            if (!string.IsNullOrWhiteSpace(numeroMotor))
+            if (!string.IsNullOrWhiteSpace(numeroMotor) && numeroMotor != NumeroMotor)
+            {
                 NumeroMotor = numeroMotor;
+                camposActualizados.Add(nameof(NumeroMotor));
+            }
 
-            if (!string.IsNullOrWhiteSpace(numeroChasis))
-                NumeroChasis = numeroChasis;
+
+            return camposActualizados;
+        }
+
+        public bool EsNumeroMotorValido(string numeroMotor)
+        {
+            return numeroMotor.StartsWith("MTR-") && numeroMotor.Length >= 8;
         }
     }
 }
