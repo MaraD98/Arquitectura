@@ -1,6 +1,6 @@
 ﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
-using Application.UseCases.DummyEntity.Commands.DeleteDummyEntity;
+using Application.UseCases.Automovil.Commands.UpdateAutomovil;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,6 +38,14 @@ namespace Controllers
             await _commandQueryBus.Send(new DeleteAutomovilCommand { AutomovilId = id });
 
             return Ok(new { mensaje = "Automovil eliminado correctamente" });
+        }
+
+        [HttpPut("api/v1/[Controller]/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAutomovilCommand command)
+        {
+            await _commandQueryBus.Send(new UpdateAutomovilWrapper(id, command));
+
+            return Ok(new { mensaje = "Automovil actualizado correctamente" });
         }
     }
 }

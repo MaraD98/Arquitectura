@@ -1,12 +1,5 @@
 ﻿using Core.Domain.Entities;
 using Domain.Validators;
-using Domain.Others.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
 
 namespace Domain.Entities
 {
@@ -62,6 +55,32 @@ namespace Domain.Entities
             return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
         }
 
-    }
+        public void Actualizar(
+            string marca,
+            string modelo,
+            string color,
+            int? fabricacion,
+            string numeroMotor,
+            string numeroChasis)
+        {
 
+            if (!string.IsNullOrWhiteSpace(marca))
+                Marca = marca;
+
+            if (!string.IsNullOrWhiteSpace(modelo))
+                Modelo = modelo;
+
+            if (!string.IsNullOrWhiteSpace(color))
+                Color = color;
+
+            if (fabricacion is not null && fabricacion >= 1995 && fabricacion <= DateTime.Now.Year)
+                Fabricacion = fabricacion.Value;
+
+            if (!string.IsNullOrWhiteSpace(numeroMotor))
+                NumeroMotor = numeroMotor;
+
+            if (!string.IsNullOrWhiteSpace(numeroChasis))
+                NumeroChasis = numeroChasis;
+        }
+    }
 }
