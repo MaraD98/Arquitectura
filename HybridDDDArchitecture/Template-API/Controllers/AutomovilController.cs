@@ -1,6 +1,7 @@
 ﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
+using Application.UseCases.Automovil.Queries.GetAutomovilBy;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,6 +47,17 @@ namespace Controllers
             await _commandQueryBus.Send(new UpdateAutomovilWrapper(id, command));
 
             return Ok(new { mensaje = "Automovil actualizado correctamente" });
+        }
+
+        [HttpGet("api/v1/[Controller]/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+
+            if (id <= 0) return BadRequest("ID inválido.");
+
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByQuery { Id = id });
+
+            return Ok(automovil);
         }
     }
 }
