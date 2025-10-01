@@ -62,6 +62,15 @@ namespace Domain.Entities
             return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
         }
 
+        public void Update(string marca, string modelo, string color, int fabricacion, string numeroMotor)
+        {
+            Marca = marca;
+            Modelo = modelo;
+            Color = color;
+            Fabricacion = fabricacion;
+            NumeroMotor = numeroMotor;
+        }
+
     }
 
 }

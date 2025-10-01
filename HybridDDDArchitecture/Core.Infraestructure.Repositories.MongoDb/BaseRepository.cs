@@ -90,6 +90,12 @@ namespace Core.Infraestructure.Repositories.MongoDb
         {
             throw new NotImplementedException("DeleteAsync() no está implementado para MongoDb.");
         }
+        public Task SaveAsync(TEntity entity)
+        {
+            // Solución temporal para que la arquitectura compile
+            // Si necesitas la funcionalidad real de MongoDb, usa ReplaceOneAsync aquí.
+            throw new NotImplementedException("SaveAsync no está implementado para MongoDb.");
+        }
 
     }
 }

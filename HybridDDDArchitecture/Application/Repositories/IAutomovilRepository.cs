@@ -1,15 +1,13 @@
-﻿using Core.Application.Repositories;
+﻿// File: Application/Repositories/IAutomovilRepository.cs
+
+using Core.Application.Repositories;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
+    // The IAutomovilRepository will automatically inherit all methods from IRepository<Automovil>
     public interface IAutomovilRepository : IRepository<Automovil>
     {
+        Task<Automovil> FindOneByChasisAsync(string chasis);
     }
-
 }

@@ -98,6 +98,15 @@ namespace Core.Infraestructure.Repositories.Sql
             Repository.Remove(entity);
             await Context.SaveChangesAsync();
         }
+        public async Task SaveAsync(TEntity entity)
+        {
+            // Marca la entidad como modificada para que Entity Framework Core 
+            // guarde los cambios cuando SaveChangesAsync se ejecute.
+            // Esto es crucial para el UpdateAutomovilHandler.
+            Context.Entry(entity).State = EntityState.Modified;
+
+            await Context.SaveChangesAsync();
+        }
 
     }
 }
