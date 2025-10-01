@@ -2,6 +2,7 @@
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
 using Application.UseCases.Automovil.Queries.GetAutomovilBy;
+using Application.UseCases.Automovil.Queries.GetAutomovilByLegajo;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,13 +50,23 @@ namespace Controllers
             return Ok(new { mensaje = "Automovil actualizado correctamente" });
         }
 
-        [HttpGet("api/v1/[Controller]/{id}")]
+        [HttpGet("api/v1/[Controller]/{id}")] 
         public async Task<IActionResult> GetById(int id)
         {
 
             if (id <= 0) return BadRequest("ID inválido.");
 
-            var automovil = await _commandQueryBus.Send(new GetAutomovilByQuery { Id = id });
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByIdQuery { Id = id });
+
+            return Ok(automovil);
+        }
+
+        [HttpGet("api/v1/[Controller]chasis/{numeroChasis}")] //controlar si hay que poner automovil en la ruta cuando ejecute 
+        public async Task<IActionResult> GetByNumeroChasis(string numeroChasis)
+        {
+            if (string.IsNullOrEmpty(numeroChasis)) return BadRequest();
+
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByLegajoQuery { NumeroChasis = numeroChasis });
 
             return Ok(automovil);
         }

@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.UseCases.Automovil.Queries.GetAutomovilBy
 {
-    public class GetAutomovilByQuery : IRequestQuery<AutomovilDto>
+    public class GetAutomovilByIdQuery : IRequestQuery<AutomovilDto>
     {
         [Required]
         public int Id { get; set; }
 
-        public GetAutomovilByQuery()
+        public GetAutomovilByIdQuery()
         {
         }
     }
