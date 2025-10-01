@@ -1,5 +1,4 @@
-﻿using static Domain.Enums.Enums;
-
+﻿
 namespace Application.DataTransferObjects
 {
     public class AutomovilDto

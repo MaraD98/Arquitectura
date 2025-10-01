@@ -3,7 +3,7 @@ using Application.Exceptions;
 using Application.Repositories;
 using Core.Application;
 
-namespace Application.UseCases.Automovil.Queries.GetAutomovilBy
+namespace Application.UseCases.Automovil.Queries.GetAutomovilById
 {
     internal sealed class GetAutomovilByIdHandler(IAutomovilRepository repository) : IRequestQueryHandler<GetAutomovilByIdQuery, AutomovilDto>
     {

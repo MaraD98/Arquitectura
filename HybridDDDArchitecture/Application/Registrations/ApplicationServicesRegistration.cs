@@ -1,7 +1,5 @@
 ﻿using Application.ApplicationServices;
-using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Core.Application;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

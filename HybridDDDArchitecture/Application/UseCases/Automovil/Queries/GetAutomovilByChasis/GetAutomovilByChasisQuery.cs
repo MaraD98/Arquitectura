@@ -3,14 +3,14 @@ using Core.Application;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Application.UseCases.Automovil.Queries.GetAutomovilByLegajo
+namespace Application.UseCases.Automovil.Queries.GetAutomovilByChasis
 {
-    public class GetAutomovilByLegajoQuery : IRequestQuery<AutomovilDto>
+    public class GetAutomovilByChasisQuery : IRequestQuery<AutomovilDto>
     {
         [Required]
         public string NumeroChasis { get; set; }
 
-        public GetAutomovilByLegajoQuery()
+        public GetAutomovilByChasisQuery()
         {
         }
     }

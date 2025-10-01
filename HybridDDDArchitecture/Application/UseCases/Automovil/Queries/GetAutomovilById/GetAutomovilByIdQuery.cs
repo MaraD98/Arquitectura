@@ -3,7 +3,7 @@ using Core.Application;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Application.UseCases.Automovil.Queries.GetAutomovilBy
+namespace Application.UseCases.Automovil.Queries.GetAutomovilById
 {
     public class GetAutomovilByIdQuery : IRequestQuery<AutomovilDto>
     {

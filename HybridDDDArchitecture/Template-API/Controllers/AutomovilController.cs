@@ -1,8 +1,8 @@
 ﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
-using Application.UseCases.Automovil.Queries.GetAutomovilBy;
-using Application.UseCases.Automovil.Queries.GetAutomovilByLegajo;
+using Application.UseCases.Automovil.Queries.GetAutomovilById;
+using Application.UseCases.Automovil.Queries.GetAutomovilByChasis;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,12 +61,12 @@ namespace Controllers
             return Ok(automovil);
         }
 
-        [HttpGet("api/v1/[Controller]chasis/{numeroChasis}")] //controlar si hay que poner automovil en la ruta cuando ejecute 
+        [HttpGet("api/v1/[Controller]chasis/{numeroChasis}")]  
         public async Task<IActionResult> GetByNumeroChasis(string numeroChasis)
         {
             if (string.IsNullOrEmpty(numeroChasis)) return BadRequest();
 
-            var automovil = await _commandQueryBus.Send(new GetAutomovilByLegajoQuery { NumeroChasis = numeroChasis });
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByChasisQuery { NumeroChasis = numeroChasis });
 
             return Ok(automovil);
         }
