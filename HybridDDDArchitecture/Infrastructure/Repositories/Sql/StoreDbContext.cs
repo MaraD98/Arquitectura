@@ -7,7 +7,7 @@ namespace Infrastructure.Repositories.Sql
     /// Contexto de almacenamiento en base de datos. Aca se definen los nombres de 
     /// las tablas, y los mapeos entre los objetos
     /// </summary>
-    internal class StoreDbContext : DbContext
+    public class StoreDbContext : DbContext
     {
         //public DbSet<DummyEntity> DummyEntity { get; set; }
         public DbSet<Automovil> Automoviles { get; set; }
