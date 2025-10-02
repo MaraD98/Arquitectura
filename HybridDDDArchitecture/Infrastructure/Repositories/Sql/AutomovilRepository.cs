@@ -3,59 +3,32 @@ using Domain.Entities;
 using Core.Infraestructure.Repositories.Sql; // Namespace de BaseRepository
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using System.Collections.Generic; // Para IEnumerable<Automovil>
-
-// CORRECCIÓN CS0234: Agregamos el using para el DbContext
-using Infrastructure.Repositories.Sql;
+using System.Collections.Generic;
+using Core.Application.Repositories; // Para IRepository
+using Infrastructure.Repositories.Sql; // Para StoreDbContext (asumido)
 
 namespace Infrastructure.Repositories.Sql
 {
-    // El constructor usa la sintaxis de constructor primario de C# (net8.0)
-    internal class AutomovilRepository(StoreDbContext context) : BaseRepository<Automovil>(context), IAutomovilRepository
+    // Hereda de BaseRepository y le pasa el contexto.
+    internal class AutomovilRepository(StoreDbContext context)
+        : BaseRepository<Automovil>(context), IAutomovilRepository
     {
-        // CORRECCIÓN CS7036: Usamos 'BaseRepository<Automovil>(context)' para pasar el argumento requerido.
-        // El constructor primario elimina la necesidad de la variable _context si no se usa fuera del constructor base.
-
-        // 1. MÉTODOS ESPECÍFICOS (mantienen las llamadas a la base Query())
+        // Método específico requerido por IAutomovilRepository (GetByChasis)
         public async Task<Automovil> GetByChasisAsync(string chasis)
         {
-            // Query() viene de BaseRepository
+            // Usamos Query() de BaseRepository para construir la consulta
             return await Query().FirstOrDefaultAsync(a => a.NumeroChasis == chasis);
         }
 
-        public async Task<bool> AutomovilExistsAsync(string chasis)
-        {
-            return await Query().AnyAsync(a => a.NumeroChasis == chasis);
-        }
+        // Métodos de IRepository que ya están cubiertos por BaseRepository, 
+        // a menos que sus firmas NO coincidan, en cuyo caso necesitas:
 
-        // 2. CORRECCIÓN CS0535/CS0738: Implementar los métodos de IAutomovilRepository
-        // cuyos tipos de retorno no coinciden con BaseRepository o que no están en BaseRepository.
-
-        // UpdateAsync (CS0535) - Implementación requerida por IAutomovilRepository
-        // BaseRepository tiene SaveAsync, que probablemente hace lo mismo.
-        public Task UpdateAsync(Automovil entity)
-        {
-            // Usamos el método SaveAsync de BaseRepository (o el método correcto para actualizar)
-            return SaveAsync(entity);
-        }
-
-        // FindAllAsync (CS0738) - El tipo de retorno de BaseRepository es List<TEntity> o Task<List<TEntity>> 
-        // pero IAutomovilRepository requiere Task<IEnumerable<Automovil>>.
+        // 🚨 Si IAutomovilRepository requiere Task<IEnumerable<Automovil>> y BaseRepository 
+        // devuelve Task<List<Automovil>>, necesitas una nueva implementación (como la que tenías).
         public new async Task<IEnumerable<Automovil>> FindAllAsync()
         {
-            // Llamamos al método base y convertimos el tipo de retorno.
+            // Llama al método base que devuelve Task<List<Automovil>> y lo cast a IEnumerable
             return await base.FindAllAsync();
         }
-
-        // AddAsync (CS0738) - El tipo de retorno de BaseRepository es Task<object> 
-        // pero IAutomovilRepository requiere Task (void).
-        public new async Task AddAsync(Automovil entity)
-        {
-            // Ejecutamos el método base que devuelve Task<object> y descartamos el objeto.
-            await base.AddAsync(entity);
-        }
-
-        // GetByIdAsync y DeleteAsync deben coincidir automáticamente o ser implementados
-        // si sus firmas no coinciden con las de BaseRepository.
     }
 }

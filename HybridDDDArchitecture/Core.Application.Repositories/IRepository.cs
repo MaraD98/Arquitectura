@@ -1,24 +1,30 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Core.Application.Repositories
 {
-    public interface IRepository<TEntity>
+    public interface IRepository<TEntity> where TEntity : class
     {
+        // CRUD (Se mantiene la firma de tu código para evitar errores en BaseRepository)
         object Add(TEntity entity);
-        Task<object> AddAsync(TEntity entity);
-        long Count(Expression<Func<TEntity, bool>> filter);
-        Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
-        List<TEntity> FindAll();
-        Task<List<TEntity>> FindAllAsync();
-        TEntity FindOne(params object[] keyValues);
-        Task<TEntity> FindOneAsync(params object[] keyValues);
+        Task<object> AddAsync(TEntity entity); // Tu BaseRepository lo usa
+        Task DeleteAsync(TEntity entity);
         void Remove(params object[] keyValues);
         void Update(object id, TEntity entity);
 
-        Task SaveAsync(TEntity entity);
-
-        IQueryable<TEntity> Query();
+        // Métodos requeridos por los Handlers
         Task<TEntity> GetByIdAsync(int id);
-        Task DeleteAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity); // Requerido por UpdateAutomovilHandler
+
+        // Consultas y Utilidades
+        IQueryable<TEntity> Query();
+        Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
+        Task<List<TEntity>> FindAllAsync();
+
+        // Se asume que este método SaveAsync realiza la acción de persistencia de la UoW o del Contexto.
+        Task SaveAsync(TEntity entity);
     }
 }
