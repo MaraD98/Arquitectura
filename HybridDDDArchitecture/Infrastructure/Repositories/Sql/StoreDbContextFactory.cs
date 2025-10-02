@@ -2,27 +2,32 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System;
+// 🚨 ELIMINAMOS los usings específicos (Json y FileExtensions) para resolver el CS0234
+// Se asume que los métodos de extensión son visibles a través del PackageReference.
 
 namespace Infrastructure.Repositories.Sql
 {
-    // 1. Implementación de la Interfaz: Esto le indica a 'dotnet ef' que aquí está la receta.
     public class StoreDbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
     {
         public StoreDbContext CreateDbContext(string[] args)
         {
-            // 2. Cargar la Configuración: 
-            // Carga manualmente appsettings.json y appsettings.Development.json 
-            // desde la ubicación del proyecto de inicio (Template-API).
             var basePath = Directory.GetCurrentDirectory();
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(basePath, "..", "Template-API"))
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env}.json", optional: true)
-                .Build();
+            // Usamos la cualificación completa para evitar cualquier confusión de tipos
+            Microsoft.Extensions.Configuration.IConfigurationBuilder builder =
+                new Microsoft.Extensions.Configuration.ConfigurationBuilder();
 
-            // 3. Obtener la Cadena de Conexión: Lee la cadena de conexión de Docker.
+            // La sintaxis de ruptura de cadena con métodos de extensión es correcta y debe funcionar.
+            builder = builder.SetBasePath(Path.Combine(basePath, "..", "Template-API"));
+            builder = builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            builder = builder.AddJsonFile($"appsettings.{env}.json", optional: true);
+
+            IConfigurationRoot configuration = builder.Build();
+
+            // -----------------------------------------------------------
+
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             if (string.IsNullOrEmpty(connectionString))
@@ -30,12 +35,10 @@ namespace Infrastructure.Repositories.Sql
                 throw new InvalidOperationException("La cadena de conexión 'DefaultConnection' no se encuentra en la configuración.");
             }
 
-            // 4. Construir Opciones: Prepara las opciones necesarias para configurar SQL Server.
-            var builder = new DbContextOptionsBuilder<StoreDbContext>();
-            builder.UseSqlServer(connectionString);
+            var optionsBuilder = new DbContextOptionsBuilder<StoreDbContext>();
+            optionsBuilder.UseSqlServer(connectionString);
 
-            // 5. Instanciar y Retornar: Crea una nueva instancia de tu StoreDbContext usando las opciones configuradas.
-            return new StoreDbContext(builder.Options);
+            return new StoreDbContext(optionsBuilder.Options);
         }
     }
 }

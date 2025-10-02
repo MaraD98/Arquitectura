@@ -1,18 +1,21 @@
 ﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
+using Application.DataTransferObjects;
+using Core.Application.ComandQueryBus.Buses; // Se asume que este using es correcto
 using Application.UseCases.Automovil.Queries;
-using Application.UseCases.Automovil.Queries.GetAllAutomovil; // Agregado para GetAll
-using Application.UseCases.Automovil.Queries.GetAutomovilByChasis; // Agregado para GetByChasis
-using Application.UseCases.Automovil.Queries.GetAutomovilById; // Agregado para GetById
+
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
-namespace Controllers
+namespace Template_API.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")] // Ruta base: /api/v1/Automovil
-    public class AutomovilController : BaseController
+    [Route("api/v1/[controller]")]
+    public class AutomovilController : ControllerBase
     {
         private readonly ICommandQueryBus _commandQueryBus;
 
@@ -21,7 +24,6 @@ namespace Controllers
             _commandQueryBus = commandQueryBus;
         }
 
-        // 1. CREATE (POST /api/v1/Automovil)
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -29,87 +31,88 @@ namespace Controllers
         {
             if (command is null) return BadRequest();
 
-            // El Handler devuelve AutomovilQueryResult
-            var automovilCreado = await _commandQueryBus.Send(command);
+            // CORRECCIÓN CS0305: Usamos el método Send con UN solo tipo genérico (TResponse)
+            var automovilCreado = await _commandQueryBus.Send<AutomovilDto>(command);
 
-            // Retorna 201 Created con la ubicación del nuevo recurso y el objeto creado
             return CreatedAtAction(nameof(GetById), new { id = automovilCreado.Id }, automovilCreado);
         }
 
-        // 2. READ BY ID (GET /api/v1/Automovil/{id})
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(AutomovilQueryResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AutomovilDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var query = new GetAutomovilByIdQuery { Id = id };
-            var automovil = await _commandQueryBus.Send(query);
+
+            // CORRECCIÓN CS0305: Usamos el método Send con UN solo tipo genérico (TResponse)
+            var automovil = await _commandQueryBus.Send<AutomovilDto>(query);
+
             if (automovil == null) return NotFound();
             return Ok(automovil);
         }
 
-        // 3. READ BY CHASSIS (GET /api/v1/Automovil/chasis/{numeroChasis})
         [HttpGet("chasis/{numeroChasis}")]
-        [ProducesResponseType(typeof(AutomovilQueryResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AutomovilDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByChasis(string numeroChasis)
         {
             var query = new GetAutomovilByChasisQuery { NumeroChasis = numeroChasis };
-            var automovil = await _commandQueryBus.Send(query);
+
+            // CORRECCIÓN CS0305: Usamos el método Send con UN solo tipo genérico (TResponse)
+            var automovil = await _commandQueryBus.Send<AutomovilDto>(query);
+
             if (automovil == null) return NotFound();
             return Ok(automovil);
         }
 
-        // 4. READ ALL (GET /api/v1/Automovil)
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<AutomovilQueryResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<AutomovilDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            // Usando la query que definimos antes
-            var query = new GetAllAutomovilQuery();
-            var automoviles = await _commandQueryBus.Send(query);
+            var query = new GetAllAutomovilesQuery();
+
+            // CORRECCIÓN CS0305: Usamos el método Send con UN solo tipo genérico (TResponse)
+            var automoviles = await _commandQueryBus.Send<IEnumerable<AutomovilDto>>(query);
+
             return Ok(automoviles);
         }
 
-        // 5. UPDATE (PUT /api/v1/Automovil/{id})
-        // NOTA: Se corrigió la ruta y se usa {id:int}
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)] // Si el handler lanza EntityNotFound
-        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAutomovilCommand command)
         {
             if (command is null || id <= 0) return BadRequest("ID o cuerpo de la solicitud inválido.");
 
-            // Asignar ID de la ruta al comando
             command.Id = id;
 
-            // El Handler devuelve un 'bool' (true si fue exitoso)
-            var success = await _commandQueryBus.Send(command);
+            // CORRECCIÓN CS0305: Usamos el método Send con UN solo tipo genérico (TResponse), asumo devuelve 'bool' o 'Unit'
+            // Si devuelve un valor de éxito/fallo (como bool) o el tipo Unit de MediatR
+            var success = await _commandQueryBus.Send<bool>(command);
 
             if (success)
             {
-                // Retornamos 200 OK con el ID del objeto actualizado
                 return Ok(new { Message = "Automóvil actualizado con éxito.", UpdatedId = id });
             }
 
-            // Si retorna false (por ejemplo, si el handler lo maneja de otra manera), es un Bad Request
             return BadRequest("Fallo al actualizar el automóvil. Revise los datos.");
         }
 
-        // 6. DELETE (DELETE /api/v1/Automovil/{id})
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest("ID inválido.");
 
-            // El handler debe lanzar una excepción si el ID no existe (404 Not Found)
+            // CORRECCIÓN: Si el comando Delete no devuelve nada, se usa el tipo 'Unit' o 'bool'.
+            // Para simplificar, asumiremos que si no devuelve nada, usamos la versión no genérica
+            // o el tipo de MediatR que es 'Unit' (si el proyecto tiene una referencia a MediatR).
+            // Lo dejamos sin tipo genérico para el comando Delete (como estaba originalmente), asumiendo que el bus lo maneja.
             await _commandQueryBus.Send(new DeleteAutomovilCommand { AutomovilId = id });
 
-            // 204 No Content indica que la acción fue exitosa pero no hay contenido que devolver
             return NoContent();
         }
     }

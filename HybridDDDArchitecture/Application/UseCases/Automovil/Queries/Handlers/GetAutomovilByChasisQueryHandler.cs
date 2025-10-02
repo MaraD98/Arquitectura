@@ -1,38 +1,26 @@
-﻿using Application.DataTransferObjects;
+﻿// Ruta: C:\Users\cebre\OneDrive\Documentos\GitHub\Arquitectura\HybridDDDArchitecture\Application\UseCases\Automovil\Queries\Handlers\GetAutomovilByChasisQueryHandler.cs
+
+using Application.DataTransferObjects;
 using Application.Repositories;
 using Core.Application;
-using System.Linq;
+using AutoMapper;
+using System.Threading.Tasks;
 
 namespace Application.UseCases.Automovil.Queries.Handlers
 {
-    internal class GetAutomovilByChasisQueryHandler : IRequestQueryHandler<GetAutomovilByChasisQuery, AutomovilDto>
+    // Asumiendo que GetAutomovilByChasisQuery es la solicitud (IRequestQuery) y AutomovilDto la respuesta
+    public class GetAutomovilByChasisQueryHandler(IAutomovilRepository automovilRepository, IMapper mapper) : IRequestQueryHandler<GetAutomovilByChasisQuery, AutomovilDto>
     {
-        private readonly IAutomovilRepository _repository;
+        private readonly IAutomovilRepository _automovilRepository = automovilRepository;
+        private readonly IMapper _mapper = mapper;
 
-        public GetAutomovilByChasisQueryHandler(IAutomovilRepository repository)
-        {
-            _repository = repository;
-        }
-
+        // La clase GetAutomovilByChasisQuery debe estar definida en algún lugar
         public async Task<AutomovilDto> Handle(GetAutomovilByChasisQuery request, CancellationToken cancellationToken)
         {
-            var automovil = _repository.Query()
- 
+            // CORRECCIÓN CS1998: Usamos 'await' para la llamada al repositorio, resolviendo el warning
+            var automovil = await _automovilRepository.GetByChasisAsync(request.NumeroChasis);
 
-               .FirstOrDefault(a => a.NumeroChasis == request.NumeroChasis);
-                
-            if (automovil == null) return null;
-
-            return new AutomovilDto
-            {
-                Id = automovil.Id,
-                Marca = automovil.Marca,
-                Modelo = automovil.Modelo,
-                Color = automovil.Color,
-                Fabricacion = automovil.Fabricacion,
-                NumeroMotor = automovil.NumeroMotor,
-                NumeroChasis = automovil.NumeroChasis
-            };
+            return _mapper.Map<AutomovilDto>(automovil);
         }
     }
 }

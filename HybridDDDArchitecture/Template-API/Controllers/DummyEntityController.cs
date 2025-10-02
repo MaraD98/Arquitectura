@@ -5,16 +5,11 @@ using Application.UseCases.DummyEntity.Queries.GetAllDummyEntities;
 using Application.UseCases.DummyEntity.Queries.GetDummyEntityBy;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
+using Core.Application.ComandQueryBus.Buses;
 
 namespace Controllers
 {
-    /// <summary>
-    /// Ejemplo de controlador que contiene los endpoints que manejan
-    /// el CRUD de la entidad Dummy
-    /// Todo controlador debe heredar de <see cref="BaseController"/>
-    /// ya que el mismo proporciona una funcionalidad para estandarizar
-    /// la respuesta de la Api Rest
-    /// </summary>
+ 
     [ApiController]
     public class DummyEntityController(ICommandQueryBus commandQueryBus) : BaseController
     {

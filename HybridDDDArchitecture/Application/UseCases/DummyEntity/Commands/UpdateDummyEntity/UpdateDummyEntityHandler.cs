@@ -4,8 +4,10 @@ using Application.Exceptions;
 using Application.Repositories;
 using Application.UseCases.DummyEntity.Commands.UpdateDummyEntity;
 using Core.Application;
+using Core.Application.ComandQueryBus.Buses;
 
-namespace ESCMB.Application.UseCases.DummyEntity.Commands.UpdateDummyEntity
+
+namespace Application.UseCases.DummyEntity.Commands.UpdateDummyEntity
 {
     internal sealed class UpdateDummyEntityHandler(ICommandQueryBus domainBus, IDummyEntityRepository dummyEntityRepository) : IRequestCommandHandler<UpdateDummyEntityCommand>
     {

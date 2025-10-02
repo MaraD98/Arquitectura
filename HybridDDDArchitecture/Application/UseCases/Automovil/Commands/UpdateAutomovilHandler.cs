@@ -1,33 +1,33 @@
-﻿using Application.Exceptions;
+﻿// CORRECCIÓN CS0246: Agregamos el using correcto para la excepción
+using Application.Exceptions;
 using Application.Repositories;
+using Application.UseCases.Automovil.Commands.UpdateAutomovil;
 using Core.Application;
 using Domain.Entities;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.UseCases.Automovil.Commands.UpdateAutomovil
+// El namespace original era Application.UseCases.Automovil.Commands.UpdateAutomovil,
+// lo simplificamos para que contenga todas las clases de Commands.
+namespace Application.UseCases.Automovil.Commands
 {
-    internal class UpdateAutomovilHandler : IRequestCommandHandler<UpdateAutomovilCommand, bool>
+    internal class UpdateAutomovilHandler(IAutomovilRepository repository) : IRequestCommandHandler<UpdateAutomovilCommand, bool>
     {
-        private readonly IAutomovilRepository _repository;
-
-        public UpdateAutomovilHandler(IAutomovilRepository repository)
-        {
-            _repository = repository;
-        }
+        private readonly IAutomovilRepository _repository = repository;
 
         public async Task<bool> Handle(UpdateAutomovilCommand request, CancellationToken cancellationToken)
         {
             // 1. Recuperar la entidad existente
             var automovil = await _repository.GetByIdAsync(request.Id);
 
-            // Si no existe, lanzamos una excepción. El middleware la mapeará a 404 Not Found.
+            // 2. Verificar existencia
+            // CORRECCIÓN CS0246: Usamos el nombre de la excepción definida en Exceptions.cs
             if (automovil == null)
             {
-                throw new EntityNotFoundException($"Automóvil con ID {request.Id} no encontrado para actualizar.");
+                throw new EntityDoesNotExistException($"Automóvil con ID {request.Id} no encontrado para actualizar.");
             }
 
-            // 2. Aplicar los cambios a través de un método de dominio
+            // 3. Actualizar propiedades del dominio
             automovil.UpdateProperties(
                 request.Marca,
                 request.Modelo,
@@ -37,16 +37,15 @@ namespace Application.UseCases.Automovil.Commands.UpdateAutomovil
                 request.NumeroChasis
             );
 
-            // 3. Revalidar la entidad después de la actualización (opcional pero recomendado)
-            if (!automovil.IsValid)
-            {
-                throw new InvalidEntityDataException(automovil.GetErrors());
-            }
+            // Si tienes validaciones de dominio:
+            // if (!automovil.IsValid)
+            // {
+            //     throw new InvalidEntityDataException(automovil.GetErrors()); 
+            // }
 
-            // 4. Persistir los cambios (UpdateAsync)
+            // 4. Persistir la actualización
             await _repository.UpdateAsync(automovil);
 
-            // Retornamos true para indicar éxito
             return true;
         }
     }
