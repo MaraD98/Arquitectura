@@ -21,7 +21,7 @@ namespace Domain.Entities
         protected Automovil()
         {
         }
-        public Automovil(string marca, string modelo, string color)
+        public Automovil(string marca, string modelo, string color, int fabricacion, string numeroMotor, string numeroChasis)
         {
             Marca = marca;
             Modelo = modelo;
@@ -62,13 +62,22 @@ namespace Domain.Entities
             return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
         }
 
-        public void Update(string marca, string modelo, string color, int fabricacion, string numeroMotor)
+        public void UpdateProperties(
+     string marca,
+     string modelo,
+     string color,
+     int fabricacion,
+     string numeroMotor,
+     string numeroChasis)
         {
             Marca = marca;
             Modelo = modelo;
             Color = color;
             Fabricacion = fabricacion;
             NumeroMotor = numeroMotor;
+            NumeroChasis = numeroChasis;
+
+            this.Validate();
         }
 
     }

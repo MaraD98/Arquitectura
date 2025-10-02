@@ -77,23 +77,24 @@ namespace Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)] // Si el handler lanza EntityNotFound
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAutomovilCommand command)
         {
             if (command is null || id <= 0) return BadRequest("ID o cuerpo de la solicitud inválido.");
 
-            // Aseguramos que el ID de la ruta se asigne al Command
+            // Asignar ID de la ruta al comando
             command.Id = id;
 
-            // El Handler debe retornar el objeto actualizado o lanzar una excepción si falla.
+            // El Handler devuelve un 'bool' (true si fue exitoso)
             var success = await _commandQueryBus.Send(command);
 
             if (success)
             {
-                // Si el handler es exitoso, retornamos 200 OK
+                // Retornamos 200 OK con el ID del objeto actualizado
                 return Ok(new { Message = "Automóvil actualizado con éxito.", UpdatedId = id });
             }
 
-            // Esto se manejaría si el handler devuelve 'false' explícitamente por una regla de negocio
+            // Si retorna false (por ejemplo, si el handler lo maneja de otra manera), es un Bad Request
             return BadRequest("Fallo al actualizar el automóvil. Revise los datos.");
         }
 
