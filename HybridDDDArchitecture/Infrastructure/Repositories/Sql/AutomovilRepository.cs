@@ -1,33 +1,27 @@
 ﻿using Application.Repositories;
 using Domain.Entities;
-using Core.Infraestructure.Repositories.Sql; // Namespace de BaseRepository
+using Core.Infraestructure.Repositories.Sql; // Asumo BaseRepository está aquí
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Core.Application.Repositories; // Para IRepository
-using Infrastructure.Repositories.Sql; // Para StoreDbContext (asumido)
 
 namespace Infrastructure.Repositories.Sql
 {
-    // Hereda de BaseRepository y le pasa el contexto.
+    // Asumo que StoreDbContext es tu contexto de datos y BaseRepository acepta DbContext.
     internal class AutomovilRepository(StoreDbContext context)
         : BaseRepository<Automovil>(context), IAutomovilRepository
     {
-        // Método específico requerido por IAutomovilRepository (GetByChasis)
+        // Implementación del Requisito 5 (GetByChasis)
         public async Task<Automovil> GetByChasisAsync(string chasis)
         {
-            // Usamos Query() de BaseRepository para construir la consulta
-            return await Query().FirstOrDefaultAsync(a => a.NumeroChasis == chasis);
+            // Repository viene de BaseRepository, es el DbSet<Automovil>
+            return await Repository.FirstOrDefaultAsync(a => a.NumeroChasis == chasis);
         }
 
-        // Métodos de IRepository que ya están cubiertos por BaseRepository, 
-        // a menos que sus firmas NO coincidan, en cuyo caso necesitas:
-
-        // 🚨 Si IAutomovilRepository requiere Task<IEnumerable<Automovil>> y BaseRepository 
-        // devuelve Task<List<Automovil>>, necesitas una nueva implementación (como la que tenías).
+        // Se requiere 'new' para ocultar la implementación de BaseRepository que devuelve List<T> 
+        // y retornar IEnumerable<T> (Requisito 6).
         public new async Task<IEnumerable<Automovil>> FindAllAsync()
         {
-            // Llama al método base que devuelve Task<List<Automovil>> y lo cast a IEnumerable
             return await base.FindAllAsync();
         }
     }

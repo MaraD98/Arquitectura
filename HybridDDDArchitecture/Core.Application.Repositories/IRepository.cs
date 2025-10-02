@@ -8,23 +8,22 @@ namespace Core.Application.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        // CRUD (Se mantiene la firma de tu código para evitar errores en BaseRepository)
-        object Add(TEntity entity);
-        Task<object> AddAsync(TEntity entity); // Tu BaseRepository lo usa
-        Task DeleteAsync(TEntity entity);
-        void Remove(params object[] keyValues);
-        void Update(object id, TEntity entity);
-
-        // Métodos requeridos por los Handlers
+        // Métodos de Lectura y Consulta
         Task<TEntity> GetByIdAsync(int id);
-        Task UpdateAsync(TEntity entity); // Requerido por UpdateAutomovilHandler
-
-        // Consultas y Utilidades
+        Task<List<TEntity>> FindAllAsync();
         IQueryable<TEntity> Query();
         Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
-        Task<List<TEntity>> FindAllAsync();
 
-        // Se asume que este método SaveAsync realiza la acción de persistencia de la UoW o del Contexto.
-        Task SaveAsync(TEntity entity);
+        // Métodos de Escritura Asíncronos
+        Task<object> AddAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity); // Usado por UpdateAutomovilHandler
+        Task DeleteAsync(TEntity entity); // Usado por DeleteAutomovilHandler
+        Task SaveAsync(TEntity entity); // Usado para persistir cambios
+
+        // Métodos Síncronos (Mantenidos por consistencia con tu BaseRepository original)
+        object Add(TEntity entity);
+        void Update(object id, TEntity entity);
+        void Remove(params object[] keyValues);
+        long Count(Expression<Func<TEntity, bool>> filter);
     }
 }
