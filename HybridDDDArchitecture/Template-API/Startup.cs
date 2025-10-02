@@ -20,7 +20,10 @@ namespace API
         {
             services.AddControllers();
             services.AddEndpointsApiExplorer();
+
+            // 🚨 Esta llamada DEBE registrar MediatR, AutoMapper y los Servicios.
             services.AddApplicationServices();
+
             services.AddInfrastructureServices(Configuration);
             services.AddSwaggerGen(c =>
             {

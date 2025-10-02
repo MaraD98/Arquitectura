@@ -18,6 +18,9 @@ namespace Application.Mappings
 
             CreateMap<Automovil, AutomovilCreado>().ReverseMap();
             CreateMap<Automovil, AutomovilEliminado>().ReverseMap();
+
+            // 🚨 (OPCIONAL): Asegúrate de mapear entre la entidad y el DTO para las QUERIES
+            CreateMap<Automovil, AutomovilDto>().ReverseMap();
         }
     }
 }
