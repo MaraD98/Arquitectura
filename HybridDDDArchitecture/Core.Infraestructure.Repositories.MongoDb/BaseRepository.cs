@@ -1,101 +1,111 @@
 ﻿using Core.Application.Repositories;
 using MongoDB.Driver;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Core.Infraestructure.Repositories.MongoDb
 {
-    public class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    // Asumimos que la inyección necesita el objeto de base de datos y el nombre de la colección
+    public abstract class BaseRepository<TEntity>(IMongoDatabase database, string collectionName) : IRepository<TEntity>
+        where TEntity : class
     {
-        public DbContext Context { get; private set; }
+        protected readonly IMongoCollection<TEntity> Repository = database.GetCollection<TEntity>(collectionName);
+        private readonly FilterDefinitionBuilder<TEntity> _filterBuilder = Builders<TEntity>.Filter;
 
-        public IMongoCollection<TEntity> Collection { get; private set; }
+        // --- Implementaciones Asíncronas ---
 
-        public BaseRepository(DbContext context)
+        // Asumiendo que TEntity tiene un campo 'Id' (o similar) que se usa como clave
+        public virtual async Task<TEntity> GetByIdAsync(int id)
         {
-            Context = context;
-            Collection = Context.GetCollection<TEntity>();
+            var filter = _filterBuilder.Eq("Id", id);
+            return await Repository.Find(filter).FirstOrDefaultAsync();
         }
 
-        public object Add(TEntity entity)
+        // 🚨 CORRECCIÓN CS0535: Implementación de UpdateAsync
+        public virtual async Task UpdateAsync(TEntity entity)
         {
-            Collection.InsertOne(entity);
-            var property = typeof(TEntity).GetProperty("Id") ?? typeof(TEntity).GetProperty("_id");
-            return (object)property?.GetValue(entity);
+            // Se asume que la entidad tiene una propiedad 'Id'
+            var idValue = entity.GetType().GetProperty("Id")?.GetValue(entity);
+            if (idValue == null) throw new InvalidOperationException("La entidad debe tener una propiedad 'Id' para usar UpdateAsync.");
+
+            var filter = _filterBuilder.Eq("Id", idValue);
+            await Repository.ReplaceOneAsync(filter, entity);
         }
 
-        public async Task<object> AddAsync(TEntity entity)
+        public virtual async Task DeleteAsync(TEntity entity)
         {
-            await Collection.InsertOneAsync(entity);
-            var property = typeof(TEntity).GetProperty("Id") ?? typeof(TEntity).GetProperty("_id");
-            return (object)property?.GetValue(entity);
+            var idValue = entity.GetType().GetProperty("Id")?.GetValue(entity);
+            if (idValue == null) return;
+            var filter = _filterBuilder.Eq("Id", idValue);
+            await Repository.DeleteOneAsync(filter);
         }
 
-        public long Count(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<List<TEntity>> FindAllAsync()
         {
-            return Collection.CountDocuments(filter);
+            return await Repository.Find(_filterBuilder.Empty).ToListAsync();
         }
 
-        public async Task<long> CountAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<long> CountAsync(Expression<Func<TEntity, bool>> filter)
         {
-            return await Collection.CountDocumentsAsync(filter);
-        }
-        
-        public List<TEntity> FindAll()
-        {
-            FilterDefinition<TEntity> filter = new BsonDocumentFilterDefinition<TEntity>([]);
-            return Collection.Find(filter).ToList();
+            return await Repository.CountDocumentsAsync(filter);
         }
 
-        public async Task<List<TEntity>> FindAllAsync()
+        public virtual async Task<object> AddAsync(TEntity entity)
         {
-            FilterDefinition<TEntity> filter = new BsonDocumentFilterDefinition<TEntity>([]);
-            return await Collection.Find(filter).ToListAsync();
+            await Repository.InsertOneAsync(entity);
+            return entity;
         }
 
-        public TEntity FindOne(params object[] keyValues)
+        public virtual Task SaveAsync(TEntity entity)
         {
-            FilterDefinition<TEntity> filter = Builders<TEntity>.Filter.Eq("_id", keyValues[0]);
-            return Collection.Find(filter).SingleOrDefault();
+            // En MongoDb, las operaciones ya persisten los cambios.
+            return Task.CompletedTask;
         }
 
-        public async Task<TEntity> FindOneAsync(params object[] keyValues)
+        public virtual async Task<TEntity> FindOneAsync(params object[] keyValues)
         {
-            FilterDefinition<TEntity> filter = Builders<TEntity>.Filter.Eq("_id", keyValues[0]);
-            return await Collection.Find(filter).SingleOrDefaultAsync();
+            // En MongoDB, 'keyValues' es complejo, asumimos que es el Id y delegamos
+            if (keyValues.Length == 1 && keyValues[0] is int id)
+            {
+                return await GetByIdAsync(id);
+            }
+            return null;
         }
 
-        public void Remove(params object[] keyValues)
+
+        // --- Implementaciones Síncronas (Para cumplir con IRepository) ---
+        public virtual object Add(TEntity entity)
         {
-            FilterDefinition<TEntity> filter = Builders<TEntity>.Filter.Eq("_id", keyValues[0]);
-            Collection.DeleteOne(filter);
+            Repository.InsertOne(entity);
+            return entity;
         }
 
-        public void Update(object id, TEntity entity)
+        public virtual void Update(object id, TEntity entity)
         {
-            FilterDefinition<TEntity> filter = Builders<TEntity>.Filter.Eq("_id", id);
-            Collection.ReplaceOne(filter, entity);
+            var filter = _filterBuilder.Eq("Id", id);
+            Repository.ReplaceOne(filter, entity);
         }
 
-        public IQueryable<TEntity> Query()
+        public virtual void Remove(params object[] keyValues)
         {
-            throw new NotImplementedException("Query() no está implementado para MongoDb.");
+            if (keyValues.Length == 1)
+            {
+                var filter = _filterBuilder.Eq("Id", keyValues[0]);
+                Repository.DeleteOne(filter);
+            }
         }
 
-        public Task<TEntity> GetByIdAsync(int id)
+        public virtual long Count(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException("GetByIdAsync() no está implementado para MongoDb.");
+            return Repository.CountDocuments(filter);
         }
 
-        public Task DeleteAsync(TEntity entity)
+        public virtual IQueryable<TEntity> Query()
         {
-            throw new NotImplementedException("DeleteAsync() no está implementado para MongoDb.");
+            return Repository.AsQueryable();
         }
-        public Task SaveAsync(TEntity entity)
-        {
-            // Solución temporal para que la arquitectura compile
-            // Si necesitas la funcionalidad real de MongoDb, usa ReplaceOneAsync aquí.
-            throw new NotImplementedException("SaveAsync no está implementado para MongoDb.");
-        }
-
     }
 }

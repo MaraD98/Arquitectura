@@ -1,28 +1,30 @@
 ﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
+// 🚨 CORRECCIÓN: Se asume que los Querys están en carpetas separadas.
+// Se usa el using genérico Application.UseCases.Automovil.Queries. Si esto falla, 
+// se deberán usar los namespaces completos como GetAutomovilByIdQuery.
 using Application.UseCases.Automovil.Queries;
-using Application.DataTransferObjects; // Asumo que AutomovilDto está aquí
+using Application.DataTransferObjects;
 using Core.Application.ComandQueryBus.Buses;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Net.Mime;
+using AutoMapper; // Necesario para IMapper
+using Domain.Entities; // Necesario para el tipo de retorno de la entidad en Create
 
 namespace Template_API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces(MediaTypeNames.Application.Json)]
-    public class AutomovilController : ControllerBase
+    // 🚨 CORRECCIÓN IDE0290: Uso de constructor principal e inyección de IMapper
+    public class AutomovilController(ICommandQueryBus commandQueryBus, IMapper mapper) : ControllerBase
     {
-        private readonly ICommandQueryBus _commandQueryBus;
-
-        public AutomovilController(ICommandQueryBus commandQueryBus)
-        {
-            _commandQueryBus = commandQueryBus;
-        }
+        private readonly ICommandQueryBus _commandQueryBus = commandQueryBus;
+        private readonly IMapper _mapper = mapper;
 
         // REQUISITO 1: POST /api/v1/automovil
         [HttpPost]
@@ -32,7 +34,11 @@ namespace Template_API.Controllers
         {
             if (command is null) return BadRequest();
 
-            var automovilCreado = await _commandQueryBus.Send<AutomovilDto>(command);
+            // 1. Se envía el comando esperando la Entidad de Dominio como respuesta
+            var automovilEntity = await _commandQueryBus.Send<Domain.Entities.Automovil>(command);
+
+            // 2. Se mapea la Entidad de Dominio al DTO para la respuesta HTTP (Corrección CS1503)
+            var automovilCreado = _mapper.Map<AutomovilDto>(automovilEntity);
 
             return CreatedAtAction(nameof(GetById), new { id = automovilCreado.Id }, automovilCreado);
         }
@@ -48,7 +54,7 @@ namespace Template_API.Controllers
 
             command.Id = id;
 
-            // El handler devuelve 'bool'
+            // Se asume que el handler de Update devuelve un 'bool' o solo el comando sin retorno (Send)
             await _commandQueryBus.Send<bool>(command);
 
             return Ok(new { Message = "Automóvil actualizado con éxito.", UpdatedId = id });
@@ -63,7 +69,6 @@ namespace Template_API.Controllers
         {
             if (id <= 0) return BadRequest("ID inválido.");
 
-            // Se envía el comando, el Handler se encarga de la lógica de negocio y excepciones
             await _commandQueryBus.Send(new DeleteAutomovilCommand { AutomovilId = id });
 
             return NoContent(); // Status 204 No Content

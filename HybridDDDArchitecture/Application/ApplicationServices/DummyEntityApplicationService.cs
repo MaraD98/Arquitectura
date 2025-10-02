@@ -1,23 +1,38 @@
-﻿using Application.Repositories;
+﻿using Application.DataTransferObjects;
+using Application.Repositories;
+using AutoMapper;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.ApplicationServices
 {
-    /// <summary>
-    /// Ejemplo de un servicio de aplicacion para resolver procesos
-    /// relacionados a la entidad Dummy que no son responsabilidad del
-    /// handler que ejecuta el caso de uso.
-    /// </summary>
-    public class DummyEntityApplicationService(IDummyEntityRepository context) : IDummyEntityApplicationService
+    public class DummyEntityApplicationService(IDummyEntityRepository dummyEntityRepository, IMapper mapper) : IDummyEntityApplicationService
     {
-        private readonly IDummyEntityRepository _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly IDummyEntityRepository _dummyEntityRepository = dummyEntityRepository;
+        private readonly IMapper _mapper = mapper;
 
-        public bool DummyEntityExist(object value)
+        public async Task<DummyEntityDto> GetDummyEntityByIdAsync(int id)
         {
-            value = value ?? throw new ArgumentNullException(nameof(value));
+            var dummyEntity = await _dummyEntityRepository.FindOneAsync(id);
+            return _mapper.Map<DummyEntityDto>(dummyEntity);
+        }
 
-            var response = _context.FindOne(value);
+        public async Task<IEnumerable<DummyEntityDto>> GetAllDummyEntitiesAsync()
+        {
+            var dummyEntities = await _dummyEntityRepository.FindAllAsync();
+            return _mapper.Map<IEnumerable<DummyEntityDto>>(dummyEntities);
+        }
 
-            return response != null;
+        // 🚨 Implementación requerida por la interfaz
+        public async Task<bool> DummyEntityExistAsync(string id)
+        {
+            // Asumiendo que el ID de la entidad es un entero (int)
+            if (int.TryParse(id, out int entityId))
+            {
+                var entity = await _dummyEntityRepository.FindOneAsync(entityId);
+                return entity is not null;
+            }
+            return false;
         }
     }
 }

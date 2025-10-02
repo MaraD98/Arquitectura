@@ -5,7 +5,9 @@ using Application.Exceptions;
 using Application.Repositories;
 using Core.Application;
 using Core.Application.ComandQueryBus.Buses;
-
+using System; // Necesario para Exception
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.UseCases.DummyEntity.Commands.CreateDummyEntity
 {
@@ -16,18 +18,21 @@ namespace Application.UseCases.DummyEntity.Commands.CreateDummyEntity
     /// si devuelve una respuesta donde <c TRequest> es del tipo <see cref="CreateDummyEntityCommand"/>
     /// y <c TResponse> del tipo de dato definido para la respuesta
     /// /// </summary>
-    internal sealed class CreateDummyEntityHandler(ICommandQueryBus domainBus, IDummyEntityRepository dummyEntityRepository, IDummyEntityApplicationService dummyEntityApplicationService) : IRequestCommandHandler<CreateDummyEntityCommand, string>
+    internal sealed class CreateDummyEntityHandler(ICommandQueryBus domainBus, IDummyEntityRepository dummyEntityRepository, IDummyEntityApplicationService dummyEntityApplicationService)
+        : IRequestCommandHandler<CreateDummyEntityCommand, string>
     {
-        private readonly ICommandQueryBus _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
-        private readonly IDummyEntityRepository _context = dummyEntityRepository ?? throw new ArgumentNullException(nameof(dummyEntityRepository));
-        private readonly IDummyEntityApplicationService _dummyEntityApplicationService = dummyEntityApplicationService ?? throw new ArgumentNullException(nameof(dummyEntityApplicationService));
+        private readonly ICommandQueryBus _domainBus = domainBus;
+        private readonly IDummyEntityRepository _context = dummyEntityRepository;
+        private readonly IDummyEntityApplicationService _dummyEntityApplicationService = dummyEntityApplicationService;
+
         public async Task<string> Handle(CreateDummyEntityCommand request, CancellationToken cancellationToken)
         {
             Domain.Entities.DummyEntity entity = new(request.dummyPropertyOne, request.dummyPropertyTwo);
 
             if (!entity.IsValid) throw new InvalidEntityDataException(entity.GetErrors());
 
-            if (_dummyEntityApplicationService.DummyEntityExist(entity.Id)) throw new EntityDoesExistException();
+            // 🚨 CS1061 RESUELTO: El método ahora existe en la interfaz.
+            if (await _dummyEntityApplicationService.DummyEntityExistAsync(entity.Id.ToString())) throw new EntityDoesExistException();
 
             try
             {
@@ -39,7 +44,7 @@ namespace Application.UseCases.DummyEntity.Commands.CreateDummyEntity
             }
             catch (Exception ex)
             {
-                throw new BussinessException(ApplicationConstants.PROCESS_EXECUTION_EXCEPTION, ex.InnerException);
+                throw new BussinessException(ApplicationConstants.PROCESS_EXECUTION_EXCEPTION, ex.InnerException ?? ex);
             }
         }
     }

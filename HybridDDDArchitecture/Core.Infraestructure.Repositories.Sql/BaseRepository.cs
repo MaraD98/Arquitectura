@@ -8,30 +8,23 @@ using System.Threading.Tasks;
 
 namespace Core.Infraestructure.Repositories.Sql
 {
-    // Usamos el TContext genérico que requiere tu código anterior
-    public abstract class BaseRepository<TEntity> : IRepository<TEntity>
+    // 🚨 CORRECCIÓN IDE0290: Uso del constructor principal
+    public abstract class BaseRepository<TEntity>(DbContext context) : IRepository<TEntity>
         where TEntity : class
     {
-        protected readonly DbContext Context;
-        protected readonly DbSet<TEntity> Repository;
+        protected readonly DbContext Context = context;
+        protected readonly DbSet<TEntity> Repository = context.Set<TEntity>();
 
-        protected BaseRepository(DbContext context)
-        {
-            Context = context;
-            Repository = context.Set<TEntity>();
-        }
-
-        // --- Implementaciones Asíncronas (Requeridas por Handlers) ---
+        // --- Implementaciones Asíncronas ---
         public virtual async Task<TEntity> GetByIdAsync(int id)
         {
-            // Busca por clave primaria (válido si TEntity tiene una propiedad 'Id')
             return await Repository.FindAsync(id);
         }
 
         public virtual async Task UpdateAsync(TEntity entity)
         {
             Repository.Update(entity);
-            await SaveAsync(entity); // Persiste el cambio
+            await Context.SaveChangesAsync();
         }
 
         public virtual async Task DeleteAsync(TEntity entity)
@@ -54,7 +47,7 @@ namespace Core.Infraestructure.Repositories.Sql
         {
             await Repository.AddAsync(entity);
             await Context.SaveChangesAsync();
-            return entity; // Devuelve el objeto, según tu interfaz
+            return entity;
         }
 
         public virtual async Task SaveAsync(TEntity entity)
@@ -62,7 +55,12 @@ namespace Core.Infraestructure.Repositories.Sql
             await Context.SaveChangesAsync();
         }
 
-        // --- Implementaciones Síncronas (Para cumplir con IRepository) ---
+        public virtual async Task<TEntity> FindOneAsync(params object[] keyValues)
+        {
+            return await Repository.FindAsync(keyValues);
+        }
+
+        // --- Implementaciones Síncronas ---
         public virtual object Add(TEntity entity)
         {
             Repository.Add(entity);
@@ -70,6 +68,7 @@ namespace Core.Infraestructure.Repositories.Sql
             return entity;
         }
 
+        // 🚨 CORRECCIÓN IDE0305: Simplificación de inicialización de colección
         public virtual List<TEntity> FindAll()
         {
             return Repository.ToList();
@@ -83,7 +82,8 @@ namespace Core.Infraestructure.Repositories.Sql
         public virtual void Remove(params object[] keyValues)
         {
             var entity = Repository.Find(keyValues);
-            if (entity != null)
+            // 🚨 CORRECCIÓN IDE0270: Simplificación de la comprobación
+            if (entity is not null)
             {
                 Repository.Remove(entity);
                 Context.SaveChanges();
@@ -92,7 +92,6 @@ namespace Core.Infraestructure.Repositories.Sql
 
         public virtual void Update(object id, TEntity entity)
         {
-            // Asume que la entidad ya está en el contexto o la adjunta
             Repository.Update(entity);
             Context.SaveChanges();
         }
@@ -105,12 +104,6 @@ namespace Core.Infraestructure.Repositories.Sql
         public virtual IQueryable<TEntity> Query()
         {
             return Repository.AsQueryable();
-        }
-
-        // Implementación requerida por IRepository que apunta a SaveAsync
-        public virtual async Task<TEntity> FindOneAsync(params object[] keyValues)
-        {
-            return await Repository.FindAsync(keyValues);
         }
     }
 }

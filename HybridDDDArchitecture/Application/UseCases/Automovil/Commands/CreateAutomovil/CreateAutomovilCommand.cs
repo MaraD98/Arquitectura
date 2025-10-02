@@ -4,7 +4,7 @@ using Application.DataTransferObjects;
 namespace Application.UseCases.Automovil.Commands.CreateAutomovil
 {
 
-    public class CreateAutomovilCommand : IRequestCommand<AutomovilDto>
+    public class CreateAutomovilCommand : IRequestCommand<Domain.Entities.Automovil>
     {
         public string Marca { get; set; }
         public string Modelo { get; set; }
@@ -14,3 +14,4 @@ namespace Application.UseCases.Automovil.Commands.CreateAutomovil
         public string NumeroChasis { get; set; }
     }
 }
+

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper; // Asumo que también usas Mapper aquí
+using AutoMapper;
 
 namespace Application.UseCases.Automovil.Queries.Handlers
 {
@@ -16,11 +16,10 @@ namespace Application.UseCases.Automovil.Queries.Handlers
 
         public async Task<IEnumerable<AutomovilDto>> Handle(GetAllAutomovilesQuery request, CancellationToken cancellationToken)
         {
-            // Usa FindAllAsync que devuelve IEnumerable<Automovil> (Requisito 6)
             var automoviles = await _repository.FindAllAsync();
 
-            // Mapea la colección completa a DTOs
-            return automoviles.Select(a => _mapper.Map<AutomovilDto>(a)).ToList();
+            // 🚨 CORRECCIÓN IDE0305: Simplificación de la inicialización
+            return automoviles.Select(_mapper.Map<AutomovilDto>).ToList();
         }
     }
 }

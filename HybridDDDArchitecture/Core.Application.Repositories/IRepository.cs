@@ -8,19 +8,22 @@ namespace Core.Application.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        // Métodos de Lectura y Consulta
+        // Métodos de Lectura y Consulta Asíncronos
         Task<TEntity> GetByIdAsync(int id);
         Task<List<TEntity>> FindAllAsync();
+
+        Task<TEntity> FindOneAsync(params object[] keyValues);
+
         IQueryable<TEntity> Query();
         Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
 
         // Métodos de Escritura Asíncronos
         Task<object> AddAsync(TEntity entity);
-        Task UpdateAsync(TEntity entity); // Usado por UpdateAutomovilHandler
-        Task DeleteAsync(TEntity entity); // Usado por DeleteAutomovilHandler
-        Task SaveAsync(TEntity entity); // Usado para persistir cambios
+        Task UpdateAsync(TEntity entity);
+        Task DeleteAsync(TEntity entity);
+        Task SaveAsync(TEntity entity);
 
-        // Métodos Síncronos (Mantenidos por consistencia con tu BaseRepository original)
+        // Métodos Síncronos (Mantenidos)
         object Add(TEntity entity);
         void Update(object id, TEntity entity);
         void Remove(params object[] keyValues);
