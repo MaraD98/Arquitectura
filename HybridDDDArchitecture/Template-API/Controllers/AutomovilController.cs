@@ -5,6 +5,7 @@ using Application.UseCases.Automovil.Queries.GetAutomovilById;
 using Application.UseCases.Automovil.Queries.GetAutomovilByChasis;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
+using Application.UseCases.Automovil.Queries.GetAllAutomovil;
 
 namespace Controllers
 {
@@ -69,6 +70,14 @@ namespace Controllers
             var automovil = await _commandQueryBus.Send(new GetAutomovilByChasisQuery { NumeroChasis = numeroChasis });
 
             return Ok(automovil);
+        }
+
+        [HttpGet("api/v1/[Controller]")]
+        public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
+        {
+            var entities = await _commandQueryBus.Send(new GetAllAutomovilQuery() { PageIndex = pageIndex, PageSize = pageSize });
+
+            return Ok(entities);
         }
     }
 }
