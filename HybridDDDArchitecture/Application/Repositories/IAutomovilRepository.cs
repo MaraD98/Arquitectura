@@ -10,8 +10,6 @@ namespace Application.Repositories
 {
     public interface IAutomovilRepository : IRepository<Automovil>
     {
-        Task<Automovil> GetByChasisAsync(string chasis);
-        new Task<IEnumerable<Automovil>> FindAllAsync();
         Task<bool> AutomovilExistsAsync(string chasis);
         Task<bool> ExisteNumeroMotorAsync(string numeroMotor, int idActual);
         Task<Automovil> GetByChasisAsync(string numeroChasis);

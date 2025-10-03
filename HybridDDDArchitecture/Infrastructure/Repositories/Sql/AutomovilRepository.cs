@@ -12,11 +12,6 @@ namespace Infrastructure.Repositories.Sql
     internal class AutomovilRepository(StoreDbContext context)
         : BaseRepository<Automovil>(context), IAutomovilRepository
     {
-        public async Task<Automovil> GetByChasisAsync(string chasis)
-        {
-            return await Repository.FirstOrDefaultAsync(a => a.NumeroChasis == chasis);
-        }
-
         // 🚨 Implementación requerida por IAutomovilRepository
         public async Task<bool> AutomovilExistsAsync(string chasis)
         {
@@ -38,8 +33,7 @@ namespace Infrastructure.Repositories.Sql
         {
             if (string.IsNullOrEmpty(numeroChasis)) return null;
 
-            return await Repository
-                .FirstOrDefaultAsync(a => a.NumeroChasis == numeroChasis);
+            return await Repository.FirstOrDefaultAsync(a => a.NumeroChasis == numeroChasis);
         }
     }
 }
