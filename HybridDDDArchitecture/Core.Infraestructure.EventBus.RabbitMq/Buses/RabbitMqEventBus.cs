@@ -11,9 +11,13 @@ using RabbitMQ.Client.Exceptions;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks; // Necesario para Task
+using System; // Necesario para Guid, Exception, etc.
+using System.Collections.Generic;
 
 namespace Core.Infraestructure
 {
+    // [FIX 2]: Se elimina IIntegrationEventHandler<IIntegrationEvent> de la firma de la clase.
     public class RabbitMqEventBus : IEventBus, IDisposable
     {
         private bool _disposedValue;
@@ -73,7 +77,7 @@ namespace Core.Infraestructure
         {
             SetConnection();
 
-            RetryPolicy retryPolicy = RetryPolicy.Handle<BrokerUnreachableException>()
+            RetryPolicy retryPolicy = Policy.Handle<BrokerUnreachableException>()
                 .Or<SocketException>()
                 .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                 {
@@ -85,7 +89,7 @@ namespace Core.Infraestructure
 
             using (IModel channel = _connectionManager.CreateModel())
             {
-                channel.ExchangeDeclare(_exchange, "direct", durable:true, autoDelete: false);
+                channel.ExchangeDeclare(_exchange, "direct", durable: true, autoDelete: false);
 
                 var message = JsonConvert.SerializeObject(@event);
                 byte[] body = Encoding.UTF8.GetBytes(message);
@@ -101,6 +105,8 @@ namespace Core.Infraestructure
                 });
             }
         }
+
+        // Se elimina el método Handle(IIntegrationEvent @event) ya que ya no se implementa el IIntegrationEventHandler
 
         public void SubscribeDynamic<THandler>(string eventName) where THandler : IDynamicIntegrationEventHandler
         {
@@ -151,14 +157,14 @@ namespace Core.Infraestructure
             {
                 return;
             }
-                
+
             if (disposing)
             {
                 if (this._consumersChannel != null)
                 {
                     _consumersChannel.Dispose();
                 }
-                    
+
                 _eventBusSubscriptionManager.Clear();
             }
             _disposedValue = true;
@@ -176,7 +182,7 @@ namespace Core.Infraestructure
             {
                 _logger.LogWarning(ex, "----- ERROR Processing message \"{Message}\"", message);
             }
-           
+
             _consumersChannel.BasicAck(args.DeliveryTag, false);
         }
 
@@ -199,7 +205,7 @@ namespace Core.Infraestructure
                 _consumersChannel = CreateConsumersChannel();
                 StartBasicConsume();
             };
-            
+
             return channel;
         }
 
@@ -210,7 +216,7 @@ namespace Core.Infraestructure
             {
                 SetConnection();
 
-                using(IModel channel = _connectionManager.CreateModel())
+                using (IModel channel = _connectionManager.CreateModel())
                 {
                     channel.QueueBind(_queueName, _exchange, eventName);
                 }

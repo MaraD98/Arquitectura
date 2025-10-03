@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.IO;
+using Microsoft.Extensions.Configuration; // Necesario para IConfiguration y ConfigurationBuilder
+using System.IO; // Necesario para Path y Directory
 using System;
-// 🚨 ELIMINAMOS los usings específicos (Json y FileExtensions) para resolver el CS0234
-// Se asume que los métodos de extensión son visibles a través del PackageReference.
+using System.Reflection; // Necesario para GetTypeInfo().Assembly
 
+// El namespace debe coincidir con el de tu DbContext.
 namespace Infrastructure.Repositories.Sql
 {
     public class StoreDbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
@@ -19,8 +19,10 @@ namespace Infrastructure.Repositories.Sql
             Microsoft.Extensions.Configuration.IConfigurationBuilder builder =
                 new Microsoft.Extensions.Configuration.ConfigurationBuilder();
 
-            // La sintaxis de ruptura de cadena con métodos de extensión es correcta y debe funcionar.
-            builder = builder.SetBasePath(Path.Combine(basePath, "..", "Template-API"));
+            // 🛠️ MODIFICACIÓN CLAVE: Aplicamos un CAST explícito en la primera llamada para resolver el error CS1929.
+            builder = (Microsoft.Extensions.Configuration.IConfigurationBuilder)builder.SetBasePath(Path.Combine(basePath, "..", "Template-API"));
+
+            // El resto de llamadas de extensión ahora se resuelven correctamente:
             builder = builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             builder = builder.AddJsonFile($"appsettings.{env}.json", optional: true);
 
@@ -36,7 +38,14 @@ namespace Infrastructure.Repositories.Sql
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<StoreDbContext>();
-            optionsBuilder.UseSqlServer(connectionString);
+
+            // Esto asegura que Entity Framework sepa dónde guardar los archivos de migración
+            var migrationsAssemblyName = typeof(StoreDbContext).GetTypeInfo().Assembly.GetName().Name;
+
+            optionsBuilder.UseSqlServer(connectionString, sqlServerOptions =>
+            {
+                sqlServerOptions.MigrationsAssembly(migrationsAssemblyName);
+            });
 
             return new StoreDbContext(optionsBuilder.Options);
         }

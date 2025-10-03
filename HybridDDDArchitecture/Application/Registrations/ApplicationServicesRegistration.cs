@@ -1,10 +1,10 @@
-﻿// Archivo: Application\Registrations\ApplicationServicesRegistration.cs
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-
-// CORRECCIÓN CS0246: Agregamos el using al namespace completo y correcto del Bus
 using Core.Application.ComandQueryBus.Buses;
+using Application.ApplicationServices;
+
+using AutoMapper;
+using Core.Application.EventBus;
 
 namespace Application.Registrations
 {
@@ -12,11 +12,23 @@ namespace Application.Registrations
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            // Registrar MediatR (asumiendo que está aquí)
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        
+            services.AddAutoMapper(cfg =>
+            {
+                // Utiliza typeof(...).Assembly para asegurar que AutoMapper encuentre los perfiles.
+                cfg.AddMaps(typeof(ApplicationServicesRegistration).Assembly);
+            });
 
-            // Se registra la interfaz ICommandQueryBus con su implementación
+            
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             services.AddScoped<ICommandQueryBus, MediatrCommandQueryBus>();
+
+            
+            services.AddScoped<IDummyEntityApplicationService, DummyEntityApplicationService>();
+            services.AddScoped<IAutomovilApplicationService, AutomovilApplicationService>();
+
+            // 🛑 REGISTRO FALTANTE: Resuelve el error de dependencia de IIntegrationEventHandler<T>
+            services.AddIntegrationEventHandlers();
 
             return services;
         }

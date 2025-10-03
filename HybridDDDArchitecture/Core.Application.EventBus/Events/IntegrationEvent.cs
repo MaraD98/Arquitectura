@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Core.Application
 {
-    public abstract class IntegrationEvent
+    // FIX: La clase abstracta debe implementar la interfaz IIntegrationEvent
+    public abstract class IntegrationEvent : IIntegrationEvent
     {
         [JsonProperty]
         public Guid Id { get; private set; }

@@ -1,32 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
-    <ProjectReference Include="..\Core.Infraestructure.Adapters.Http\Core.Infraestructure.Adapters.Http.csproj" />
-    <ProjectReference Include="..\Core.Infraestructure.EventBus.RabbitMq\Core.Infraestructure.EventBus.RabbitMq.csproj" />
-    <ProjectReference Include="..\Core.Infraestructure.Repositories.MongoDb\Core.Infraestructure.Repositories.MongoDb.csproj" />
-    <ProjectReference Include="..\Core.Infraestructure.Repositories.Sql\Core.Infraestructure.Repositories.Sql.csproj" />
-	  <ProjectReference Include="..\Domain\Domain.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+		<ProjectReference Include="..\Core.Infraestructure.Adapters.Http\Core.Infraestructure.Adapters.Http.csproj" />
+		<ProjectReference Include="..\Core.Infraestructure.EventBus.RabbitMq\Core.Infraestructure.EventBus.RabbitMq.csproj" />
+		<ProjectReference Include="..\Core.Infraestructure.Repositories.MongoDb\Core.Infraestructure.Repositories.MongoDb.csproj" />
+		<ProjectReference Include="..\Core.Infraestructure.Repositories.Sql\Core.Infraestructure.Repositories.Sql.csproj" />
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Adapters\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Adapters\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
+	</ItemGroup>
 
 </Project>
