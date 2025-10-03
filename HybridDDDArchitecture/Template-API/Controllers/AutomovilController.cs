@@ -1,112 +1,83 @@
-﻿using Application.UseCases.Automovil.Commands.CreateAutomovil;
+using Application.UseCases.Automovil.Commands.CreateAutomovil;
 using Application.UseCases.Automovil.Commands.DeleteAutomovil;
 using Application.UseCases.Automovil.Commands.UpdateAutomovil;
-// 🚨 CORRECCIÓN: Se asume que los Querys están en carpetas separadas.
-// Se usa el using genérico Application.UseCases.Automovil.Queries. Si esto falla, 
-// se deberán usar los namespaces completos como GetAutomovilByIdQuery.
-using Application.UseCases.Automovil.Queries;
-using Application.DataTransferObjects;
-using Core.Application.ComandQueryBus.Buses;
+using Application.UseCases.Automovil.Queries.GetAutomovilById;
+using Application.UseCases.Automovil.Queries.GetAutomovilByChasis;
+using Core.Application;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.Net.Mime;
-using AutoMapper; // Necesario para IMapper
-using Domain.Entities; // Necesario para el tipo de retorno de la entidad en Create
+using Application.UseCases.Automovil.Queries.GetAllAutomovil;
 
-namespace Template_API.Controllers
+namespace Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
-    [Produces(MediaTypeNames.Application.Json)]
-    // 🚨 CORRECCIÓN IDE0290: Uso de constructor principal e inyección de IMapper
-    public class AutomovilController(ICommandQueryBus commandQueryBus, IMapper mapper) : ControllerBase
+    public class AutomovilController : BaseController
     {
-        private readonly ICommandQueryBus _commandQueryBus = commandQueryBus;
-        private readonly IMapper _mapper = mapper;
+        private readonly ICommandQueryBus _commandQueryBus;
 
-        // REQUISITO 1: POST /api/v1/automovil
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateAutomovilCommand command)
+        public AutomovilController(ICommandQueryBus commandQueryBus)
+        {
+            _commandQueryBus = commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
+        }
+
+        [HttpPost("api/v1/[controller]")]
+        public async Task<IActionResult> Create(CreateAutomovilCommand command)
         {
             if (command is null) return BadRequest();
 
-            // 1. Se envía el comando esperando la Entidad de Dominio como respuesta
-            var automovilEntity = await _commandQueryBus.Send<Domain.Entities.Automovil>(command);
+            var id = await _commandQueryBus.Send(command);
 
-            // 2. Se mapea la Entidad de Dominio al DTO para la respuesta HTTP (Corrección CS1503)
-            var automovilCreado = _mapper.Map<AutomovilDto>(automovilEntity);
-
-            return CreatedAtAction(nameof(GetById), new { id = automovilCreado.Id }, automovilCreado);
+            return Created($"api/v1/[controller]/{id}", new
+            {
+                Id = id,
+                mensaje = "Automovil creado correctamente"
+            });
         }
 
-        // REQUISITO 2: PUT /api/v1/automovil/{id}
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateAutomovilCommand command)
-        {
-            if (command is null || id <= 0) return BadRequest("ID o cuerpo de la solicitud inválido.");
-
-            command.Id = id;
-
-            // Se asume que el handler de Update devuelve un 'bool' o solo el comando sin retorno (Send)
-            await _commandQueryBus.Send<bool>(command);
-
-            return Ok(new { Message = "Automóvil actualizado con éxito.", UpdatedId = id });
-        }
-
-        // REQUISITO 3: DELETE /api/v1/automovil/{id}
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpDelete("api/v1/[controller]/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest("ID inválido.");
 
             await _commandQueryBus.Send(new DeleteAutomovilCommand { AutomovilId = id });
 
-            return NoContent(); // Status 204 No Content
+            return Ok(new { mensaje = "Automovil eliminado correctamente" });
         }
 
-        // REQUISITO 4: GET /api/v1/automovil/{id}
-        [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(AutomovilDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPut("api/v1/[Controller]/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateAutomovilCommand command)
+        {
+            await _commandQueryBus.Send(new UpdateAutomovilWrapper(id, command));
+
+            return Ok(new { mensaje = "Automovil actualizado correctamente" });
+        }
+
+        [HttpGet("api/v1/[Controller]/{id}")] 
         public async Task<IActionResult> GetById(int id)
         {
-            var query = new GetAutomovilByIdQuery { Id = id };
-            var automovil = await _commandQueryBus.Send<AutomovilDto>(query);
+
+            if (id <= 0) return BadRequest("ID inválido.");
+
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByIdQuery { Id = id });
 
             return Ok(automovil);
         }
 
-        // REQUISITO 5: GET /api/v1/automovil/chasis/{numeroChasis}
-        [HttpGet("chasis/{numeroChasis}")]
-        [ProducesResponseType(typeof(AutomovilDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByChasis(string numeroChasis)
+        [HttpGet("api/v1/[Controller]chasis/{numeroChasis}")]  
+        public async Task<IActionResult> GetByNumeroChasis(string numeroChasis)
         {
-            var query = new GetAutomovilByChasisQuery { NumeroChasis = numeroChasis };
-            var automovil = await _commandQueryBus.Send<AutomovilDto>(query);
+            if (string.IsNullOrEmpty(numeroChasis)) return BadRequest();
+
+            var automovil = await _commandQueryBus.Send(new GetAutomovilByChasisQuery { NumeroChasis = numeroChasis });
 
             return Ok(automovil);
         }
 
-        // REQUISITO 6: GET /api/v1/automovil
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<AutomovilDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        [HttpGet("api/v1/[Controller]")]
+        public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
         {
-            var query = new GetAllAutomovilesQuery();
-            var automoviles = await _commandQueryBus.Send<IEnumerable<AutomovilDto>>(query);
+            var entities = await _commandQueryBus.Send(new GetAllAutomovilQuery() { PageIndex = pageIndex, PageSize = pageSize });
 
-            return Ok(automoviles);
+            return Ok(entities);
         }
     }
 }

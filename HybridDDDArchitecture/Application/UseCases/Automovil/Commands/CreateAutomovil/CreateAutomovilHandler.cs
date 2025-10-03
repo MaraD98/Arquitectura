@@ -1,30 +1,48 @@
-﻿using Application.Repositories;
+using Application.ApplicationServices;
+using Application.Constants;
+using Application.DomainEvents;
+using Application.Exceptions;
+using Application.Repositories;
 using Core.Application;
-using Domain.Entities;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Application.UseCases.Automovil.Commands.CreateAutomovil
 {
-    // 🚨 CORRECCIÓN CS0311 / CS0118: El handler usa el tipo de retorno calificado Domain.Entities.Automovil
-    internal class CreateAutomovilHandler(IAutomovilRepository automovilRepository)
-        : IRequestCommandHandler<CreateAutomovilCommand, Domain.Entities.Automovil>
+    internal class CreateAutomovilHandler : IRequestCommandHandler<CreateAutomovilCommand, string>
     {
-        private readonly IAutomovilRepository _automovilRepository = automovilRepository;
+        private readonly ICommandQueryBus _domainBus;
+        private readonly IAutomovilRepository _automovilRepository;
+        private readonly IAutomovilApplicationService _automovilApplicationService;
 
-        // El método Handle ahora también devuelve el tipo calificado
-        public async Task<Domain.Entities.Automovil> Handle(CreateAutomovilCommand request, CancellationToken cancellationToken)
+        public CreateAutomovilHandler(
+            ICommandQueryBus domainBus,
+            IAutomovilRepository automovilRepository,
+            IAutomovilApplicationService automovilApplicationService)
         {
-            // Usamos el constructor corregido que solo toma 3 argumentos.
-            var automovil = new Domain.Entities.Automovil(
-                request.Marca,
-                request.Modelo,
-                request.Color
-            );
+            _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
+            _automovilRepository = automovilRepository ?? throw new ArgumentNullException(nameof(automovilRepository));
+            _automovilApplicationService = automovilApplicationService ?? throw new ArgumentNullException(nameof(automovilApplicationService));
+        }
 
-            await _automovilRepository.AddAsync(automovil);
+        public async Task<string> Handle(CreateAutomovilCommand request, CancellationToken cancellationToken)
+        {
+            var entity = new Domain.Entities.Automovil(request.Marca, request.Modelo, request.Color);
 
-            return automovil;
+            if (!entity.IsValid) throw new InvalidEntityDataException(entity.GetErrors());
+
+            if (_automovilApplicationService.AutomovilExist(entity.NumeroChasis)) throw new EntityDoesExistException();
+
+            try
+            {
+                object createdId = await _automovilRepository.AddAsync(entity);
+
+                await _domainBus.Publish(entity.To<AutomovilCreado>(), cancellationToken);
+
+                return createdId.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new BussinessException(ApplicationConstants.PROCESS_EXECUTION_EXCEPTION, ex.InnerException);
+            }
         }
     }
 }

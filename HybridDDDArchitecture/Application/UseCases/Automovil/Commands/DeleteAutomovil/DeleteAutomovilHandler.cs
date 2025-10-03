@@ -1,28 +1,42 @@
-﻿using Application.Exceptions;
+using Application.Constants;
+using Application.DomainEvents;
+using Application.Exceptions;
 using Application.Repositories;
 using Core.Application;
-using System.Threading;
-using System.Threading.Tasks;
+using MediatR;
 
 namespace Application.UseCases.Automovil.Commands.DeleteAutomovil
 {
-    internal class DeleteAutomovilHandler(IAutomovilRepository repository) : IRequestCommandHandler<DeleteAutomovilCommand, bool>
+    internal class DeleteAutomovilHandler : IRequestCommandHandler<DeleteAutomovilCommand, Unit>
     {
-        private readonly IAutomovilRepository _repository = repository;
+        private readonly ICommandQueryBus _domainBus;
+        private readonly IAutomovilRepository _automovilRepository;
 
-        public async Task<bool> Handle(DeleteAutomovilCommand request, CancellationToken cancellationToken)
+        public DeleteAutomovilHandler(ICommandQueryBus domainBus, IAutomovilRepository automovilRepository)
         {
-            var automovil = await _repository.GetByIdAsync(request.AutomovilId);
+            _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
+            _automovilRepository = automovilRepository ?? throw new ArgumentNullException(nameof(automovilRepository));
+        }
 
-            // 🚨 CORRECCIÓN IDE0270: Simplificación de la comprobación a 'is null'
+        public async Task<Unit> Handle(DeleteAutomovilCommand request, CancellationToken cancellationToken)
+        {
+            var automovil = await _automovilRepository.GetByIdAsync(request.AutomovilId);
+
             if (automovil is null)
+                throw new EntityDoesNotExistException();
+
+            try
             {
-                throw new EntityDoesNotExistException($"Automóvil con ID {request.AutomovilId} no encontrado para eliminar.");
+                await _automovilRepository.DeleteAsync(automovil);
+
+                await _domainBus.Publish(automovil.To<AutomovilEliminado>(), cancellationToken);
+
+                return Unit.Value;
             }
-
-            await _repository.DeleteAsync(automovil);
-
-            return true;
+            catch (Exception ex)
+            {
+                throw new BussinessException(ApplicationConstants.PROCESS_EXECUTION_EXCEPTION, ex.InnerException);
+            }
         }
     }
 }

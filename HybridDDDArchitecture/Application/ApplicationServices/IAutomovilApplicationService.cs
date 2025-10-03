@@ -1,14 +1,12 @@
-﻿using Application.DataTransferObjects;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Core.Application.Repositories;
+using Domain.Entities;
 
-// Este namespace debe coincidir con el de la implementación (ApplicationServices)
-namespace Application.ApplicationServices
+namespace Application.Repositories
 {
-    public interface IAutomovilApplicationService
+    public interface IAutomovilRepository : IRepository<Automovil>
     {
-        Task<AutomovilDto> GetAutomovilByChasisAsync(string chasis);
-        Task<IEnumerable<AutomovilDto>> GetAllAutomovilesAsync();
-        Task<bool> AutomovilExist(string chasis);
+        Task<bool> ExisteNumeroMotorAsync(string numeroMotor, int idActual);
+        Task<Automovil> GetByChasisAsync(string numeroChasis);
     }
+
 }
