@@ -1,13 +1,10 @@
-﻿
-
-using Application.DataTransferObjects;
+﻿using Application.DataTransferObjects;
 using Application.Exceptions;
 using Application.Repositories;
-using Application.UseCases.Automovil.Queries.GetAutomovilByChasis;
 using Core.Application;
 
 
-namespace Application.UseCases.Automovil.Queries.GetAutomovilByLegajo
+namespace Application.UseCases.Automovil.Commands.Queries.GetAutomovilByChasis
 {
     internal class GetAutomovilByChasisHandler(IAutomovilRepository repository) : IRequestQueryHandler<GetAutomovilByChasisQuery, AutomovilDto>
     {
