@@ -18,6 +18,7 @@ namespace Application.Mappings
 
             CreateMap<Automovil, AutomovilCreado>().ReverseMap();
             CreateMap<Automovil, AutomovilEliminado>().ReverseMap();
+            CreateMap<Automovil, AutomovilDto>().ReverseMap();
         }
     }
 }
