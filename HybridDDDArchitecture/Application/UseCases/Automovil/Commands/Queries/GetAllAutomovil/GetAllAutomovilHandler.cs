@@ -9,7 +9,7 @@ namespace Application.UseCases.Automovil.Queries.GetAllAutomovil
         private readonly IAutomovilRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         public async Task<QueryResult<AutomovilDto>> Handle(GetAllAutomovilQuery query, CancellationToken cancellationToken)
         {
-            IList<Domain.Entities.Automovil> automoviles = await _repository.FindAllAsync();
+            IList<Domain.Entities.Automovil> automoviles = (await _repository.FindAllAsync()).ToList();
 
             return new QueryResult<AutomovilDto>(automoviles.To<AutomovilDto>(), automoviles.Count, query.PageSize, query.PageIndex);
         }
