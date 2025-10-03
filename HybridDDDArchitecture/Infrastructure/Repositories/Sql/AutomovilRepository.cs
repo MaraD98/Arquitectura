@@ -4,7 +4,7 @@ using Core.Infraestructure.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Infrastructure.Repositories.Sql; // Asumiendo StoreDbContext está aquí
+using Infrastructure.Repositories.Sql; 
 
 namespace Infrastructure.Repositories.Sql
 {
