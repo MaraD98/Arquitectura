@@ -1,7 +1,12 @@
-﻿namespace Application.ApplicationServices
+using Core.Application.Repositories;
+using Domain.Entities;
+
+namespace Application.Repositories
 {
-    public interface IAutomovilApplicationService
+    public interface IAutomovilRepository : IRepository<Automovil>
     {
-        bool AutomovilExist(string numeroChasis);
+        Task<bool> ExisteNumeroMotorAsync(string numeroMotor, int idActual);
+        Task<Automovil> GetByChasisAsync(string numeroChasis);
     }
+
 }

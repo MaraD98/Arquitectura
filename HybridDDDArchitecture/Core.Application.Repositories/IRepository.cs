@@ -1,21 +1,32 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Core.Application.Repositories
 {
-    public interface IRepository<TEntity>
+    public interface IRepository<TEntity> where TEntity : class
     {
-        object Add(TEntity entity);
-        Task<object> AddAsync(TEntity entity);
-        long Count(Expression<Func<TEntity, bool>> filter);
-        Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
-        List<TEntity> FindAll();
-        Task<List<TEntity>> FindAllAsync();
-        TEntity FindOne(params object[] keyValues);
-        Task<TEntity> FindOneAsync(params object[] keyValues);
-        void Remove(params object[] keyValues);
-        void Update(object id, TEntity entity);
-        IQueryable<TEntity> Query();
+        // Métodos de Lectura y Consulta Asíncronos
         Task<TEntity> GetByIdAsync(int id);
+        Task<List<TEntity>> FindAllAsync();
+
+        Task<TEntity> FindOneAsync(params object[] keyValues);
+
+        IQueryable<TEntity> Query();
+        Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
+
+        // Métodos de Escritura Asíncronos
+        Task<object> AddAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TEntity entity);
+        Task SaveAsync(TEntity entity);
+
+        // Métodos Síncronos (Mantenidos)
+        object Add(TEntity entity);
+        void Update(object id, TEntity entity);
+        void Remove(params object[] keyValues);
+        long Count(Expression<Func<TEntity, bool>> filter);
     }
 }

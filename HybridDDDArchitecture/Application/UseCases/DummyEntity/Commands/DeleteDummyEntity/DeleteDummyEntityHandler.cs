@@ -4,6 +4,7 @@ using Application.Exceptions;
 using Application.Repositories;
 using Core.Application;
 using MediatR;
+using Core.Application.ComandQueryBus.Buses;
 
 namespace Application.UseCases.DummyEntity.Commands.DeleteDummyEntity
 {

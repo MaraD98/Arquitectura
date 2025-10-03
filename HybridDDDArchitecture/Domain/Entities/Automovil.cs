@@ -1,4 +1,4 @@
-﻿using Core.Domain.Entities;
+using Core.Domain.Entities;
 using Domain.Validators;
 
 namespace Domain.Entities
@@ -11,9 +11,11 @@ namespace Domain.Entities
         public int Fabricacion { get; private set; }
         public string NumeroMotor { get; private set; }
         public string NumeroChasis { get; private set; }
+        
         protected Automovil()
         {
         }
+
         public Automovil(string marca, string modelo, string color)
         {
             Marca = marca;
@@ -22,35 +24,39 @@ namespace Domain.Entities
             Fabricacion = GenerarAñoFabricacion();
             NumeroMotor = GenerarNumeroMotor(modelo,color);
             NumeroChasis = GenerarNumeroChasis(marca, modelo);
+        }   
+
+        public void UpdateProperties(string color)
+        {
+            Color = color;
+            base.Validate(); // 🚨 CORRECCIÓN CS1501: Se llama sin argumentos
         }
-        private int GenerarAñoFabricacion()
+
+        private static int GenerarAñoFabricacion()
         {
             var añoActual = DateTime.Now.Year;
             var añoMinimo = 1995;
-
             var random = new Random();
-            return random.Next(añoMinimo, añoActual + 1); 
+            return random.Next(añoMinimo, añoActual + 1);
         }
 
-        private string GenerarNumeroMotor(string modelo, string color)
+        private static string GenerarNumeroMotor(string modelo, string color)
         {
-            var modeloCod = modelo.Length >= 3 ? modelo.Substring(0, 3).ToUpper() : modelo.ToUpper().PadRight(3, 'X');
-            var colorCod = color.Length >= 3 ? color.Substring(0, 3).ToUpper() : color.ToUpper().PadRight(3, 'X');
-
-            var fechaCod = DateTime.Now.ToString("yyMMddHHmm"); 
-            var sufijo = Guid.NewGuid().ToString("N").Substring(0, 4); 
+            var modeloCod = modelo.Length >= 3 ? modelo[..3].ToUpper() : modelo.ToUpper().PadRight(3, 'X');
+            var colorCod = color.Length >= 3 ? color[..3].ToUpper() : color.ToUpper().PadRight(3, 'X');
+            var fechaCod = DateTime.Now.ToString("yyMMdd");
+            var random = new Random();
+            var sufijo = random.Next(1000, 9999).ToString();
 
             return $"MTR-{modeloCod}{colorCod}-{fechaCod}-{sufijo}";
         }
-        private string GenerarNumeroChasis(string marca, string modelo)
-        {
-            var marcaCod = marca.Length >= 3 ? marca.Substring(0, 3).ToUpper() : marca.ToUpper().PadRight(3, 'X');
-            var modeloCod = modelo.Length >= 3 ? modelo.Substring(0, 3).ToUpper() : modelo.ToUpper().PadRight(3, 'X');
 
-            var fechaCod = DateTime.Now.ToString("yyMMddHHmm"); 
-            var hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray())
-                .Replace("=", "").Replace("+", "").Replace("/", "")
-                .Substring(0, 4); 
+        private static string GenerarNumeroChasis(string marca, string modelo)
+        {
+            var marcaCod = marca.Length >= 3 ? marca[..3].ToUpper() : marca.ToUpper().PadRight(3, 'X');
+            var modeloCod = modelo.Length >= 3 ? modelo[..3].ToUpper() : modelo.ToUpper().PadRight(3, 'X');
+            var fechaCod = DateTime.Now.ToString("yyMMdd");
+            var hash = Guid.NewGuid().ToString()[..4].ToUpper();
 
             return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
         }

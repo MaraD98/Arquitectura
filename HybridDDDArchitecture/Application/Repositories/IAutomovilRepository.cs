@@ -1,4 +1,4 @@
-﻿using Core.Application.Repositories;
+using Core.Application.Repositories;
 using Domain.Entities;
 
 namespace Application.Repositories

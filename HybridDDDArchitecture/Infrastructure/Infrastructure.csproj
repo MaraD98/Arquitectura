@@ -12,7 +12,7 @@
     <ProjectReference Include="..\Core.Infraestructure.EventBus.RabbitMq\Core.Infraestructure.EventBus.RabbitMq.csproj" />
     <ProjectReference Include="..\Core.Infraestructure.Repositories.MongoDb\Core.Infraestructure.Repositories.MongoDb.csproj" />
     <ProjectReference Include="..\Core.Infraestructure.Repositories.Sql\Core.Infraestructure.Repositories.Sql.csproj" />
-    <ProjectReference Include="..\Domain\Domain.csproj" />
+	  <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
   </ItemGroup>
 
 </Project>

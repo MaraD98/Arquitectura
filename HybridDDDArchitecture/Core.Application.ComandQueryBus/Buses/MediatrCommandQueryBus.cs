@@ -1,6 +1,9 @@
 ﻿using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
+using Core.Application.ComandQueryBus.Buses;
 
-namespace Core.Application
+namespace Core.Application.ComandQueryBus.Buses
 {
     public class MediatrCommandQueryBus(IMediator mediator) : ICommandQueryBus
     {

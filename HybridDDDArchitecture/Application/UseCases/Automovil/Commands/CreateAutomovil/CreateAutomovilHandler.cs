@@ -1,4 +1,4 @@
-﻿using Application.ApplicationServices;
+using Application.ApplicationServices;
 using Application.Constants;
 using Application.DomainEvents;
 using Application.Exceptions;

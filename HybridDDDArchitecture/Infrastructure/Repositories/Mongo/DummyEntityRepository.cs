@@ -1,6 +1,7 @@
 ﻿using Application.Repositories;
 using Core.Infraestructure.Repositories.MongoDb;
 using Domain.Entities;
+using MongoDB.Driver;
 
 namespace Infrastructure.Repositories.Mongo
 {
@@ -10,10 +11,10 @@ namespace Infrastructure.Repositories.Mongo
     /// creada en la capa de aplicacion, y heredar de <see cref="BaseRepository{T}"/>
     /// donde <c T> es la entidad de dominio que queremos persistir
     /// </summary>
-    internal sealed class DummyEntityRepository : BaseRepository<DummyEntity>, IDummyEntityRepository
+    // 🚨 CORRECCIÓN IDE0290: Uso de constructor principal
+    internal sealed class DummyEntityRepository(IMongoDatabase database)
+        : BaseRepository<DummyEntity>(database, "DummyEntities"), IDummyEntityRepository
     {
-        public DummyEntityRepository(StoreDbContext context) : base(context)
-        {
-        }
+        // El cuerpo del constructor ya no es necesario
     }
 }

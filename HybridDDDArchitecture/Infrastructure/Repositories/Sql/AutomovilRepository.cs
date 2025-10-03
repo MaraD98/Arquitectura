@@ -1,4 +1,4 @@
-﻿using Application.Repositories;
+using Application.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
