@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Application.DataTransferObjects;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
+// Este namespace debe coincidir con el de la implementación (ApplicationServices)
 namespace Application.ApplicationServices
 {
     public interface IAutomovilApplicationService
     {
-        bool AutomovilExist(string numeroChasis);
+        Task<AutomovilDto> GetAutomovilByChasisAsync(string chasis);
+        Task<IEnumerable<AutomovilDto>> GetAllAutomovilesAsync();
+        Task<bool> AutomovilExist(string chasis);
     }
 }

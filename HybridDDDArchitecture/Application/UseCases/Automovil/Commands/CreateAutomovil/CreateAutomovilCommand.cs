@@ -1,17 +1,17 @@
 ﻿using Core.Application;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application.DataTransferObjects;
 
 namespace Application.UseCases.Automovil.Commands.CreateAutomovil
 {
-    public class CreateAutomovilCommand : IRequestCommand<string>
+
+    public class CreateAutomovilCommand : IRequestCommand<Domain.Entities.Automovil>
     {
         public string Marca { get; set; }
         public string Modelo { get; set; }
         public string Color { get; set; }
+        public int Fabricacion { get; set; }
+        public string NumeroMotor { get; set; }
+        public string NumeroChasis { get; set; }
     }
-
 }
+

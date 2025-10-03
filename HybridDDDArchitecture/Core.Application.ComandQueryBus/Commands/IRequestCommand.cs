@@ -1,12 +1,12 @@
-﻿using MediatR;
+﻿    using MediatR;
 
-namespace Core.Application
-{
-    public interface IRequestCommand : IRequest
+    namespace Core.Application
     {
-    }
+        public interface IRequestCommand : IRequest
+        {
+        }
 
-    public interface IRequestCommand<out TResponse> : IRequest<TResponse>
-    {
+        public interface IRequestCommand<out TResponse> : IRequest<TResponse>
+        {
+        }
     }
-}

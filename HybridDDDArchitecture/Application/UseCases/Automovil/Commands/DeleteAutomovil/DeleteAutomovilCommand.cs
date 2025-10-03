@@ -9,17 +9,9 @@ using System.Threading.Tasks;
 
 namespace Application.UseCases.Automovil.Commands.DeleteAutomovil
 {
-    public class DeleteAutomovilCommand : IRequestCommand<Unit>
+    // IRequestCommand<bool> indica que el handler devolverá true si la eliminación fue exitosa.
+    public class DeleteAutomovilCommand : IRequestCommand<bool>
     {
-        [Required]
         public int AutomovilId { get; set; }
-
-        public DeleteAutomovilCommand()
-        {
-        }
-        //public DeleteAutomovilCommand(int automovilId) podria agregar
-        //{
-        //    AutomovilId = automovilId;
-        //}
     }
 }
