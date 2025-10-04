@@ -1,12 +1,5 @@
 ﻿using Core.Domain.Entities;
 using Domain.Validators;
-using Domain.Others.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
 
 namespace Domain.Entities
 {
@@ -26,26 +19,88 @@ namespace Domain.Entities
             Marca = marca;
             Modelo = modelo;
             Color = color;
-            NumeroMotor = GenerarNumeroMotor(marca, modelo);
-            NumeroChasis = GenerarNumeroChasis(modelo, color);
-            Console.WriteLine($"[Automovil] Marca: {marca}");
-            Console.WriteLine($"[Automovil] Modelo: {modelo}");
-            Console.WriteLine($"[Automovil] Color: {color}");
-            Console.WriteLine($"[Automovil] NumeroMotor generado: {NumeroMotor}");
-            Console.WriteLine($"[Automovil] NumeroChasis generado: {NumeroChasis}");
+            Fabricacion = GenerarAñoFabricacion();
+            NumeroMotor = GenerarNumeroMotor(modelo,color);
+            NumeroChasis = GenerarNumeroChasis(marca, modelo);
         }
-        private string GenerarNumeroMotor(string marca, string modelo)
+        private int GenerarAñoFabricacion()
         {
-            var sufijo = Guid.NewGuid().ToString("N").Substring(0, 6);
-            return $"MTR-{marca.Substring(0, 3).ToUpper()}-{modelo.Substring(0,
-           3).ToUpper()}-{DateTime.Now:yyyyMMddHHmmss}-{sufijo}";
+            var añoActual = DateTime.Now.Year;
+            var añoMinimo = 1995;
+
+            var random = new Random();
+            return random.Next(añoMinimo, añoActual + 1); 
         }
-        private string GenerarNumeroChasis(string modelo, string color)
+
+        private string GenerarNumeroMotor(string modelo, string color)
         {
-            var sufijo = Guid.NewGuid().ToString("N").Substring(0, 6);
-            return $"CHS-{modelo.Substring(0, 3).ToUpper()}-{color.Substring(0,
-           3).ToUpper()}-{DateTime.Now:yyyyMMddHHmmss}-{sufijo}";
+            var modeloCod = modelo.Length >= 3 ? modelo.Substring(0, 3).ToUpper() : modelo.ToUpper().PadRight(3, 'X');
+            var colorCod = color.Length >= 3 ? color.Substring(0, 3).ToUpper() : color.ToUpper().PadRight(3, 'X');
+
+            var fechaCod = DateTime.Now.ToString("yyMMddHHmm"); 
+            var sufijo = Guid.NewGuid().ToString("N").Substring(0, 4); 
+
+            return $"MTR-{modeloCod}{colorCod}-{fechaCod}-{sufijo}";
+        }
+        private string GenerarNumeroChasis(string marca, string modelo)
+        {
+            var marcaCod = marca.Length >= 3 ? marca.Substring(0, 3).ToUpper() : marca.ToUpper().PadRight(3, 'X');
+            var modeloCod = modelo.Length >= 3 ? modelo.Substring(0, 3).ToUpper() : modelo.ToUpper().PadRight(3, 'X');
+
+            var fechaCod = DateTime.Now.ToString("yyMMddHHmm"); 
+            var hash = Convert.ToBase64String(Guid.NewGuid().ToByteArray())
+                .Replace("=", "").Replace("+", "").Replace("/", "")
+                .Substring(0, 4); 
+
+            return $"CHS-{marcaCod}{modeloCod}-{fechaCod}-{hash}";
+        }
+
+        public List<string> Actualizar(
+        string marca,
+        string modelo,
+        string color,
+        int? fabricacion,
+        string numeroMotor)
+        {
+            var camposActualizados = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(marca) && marca != Marca)
+            {
+                Marca = marca;
+                camposActualizados.Add(nameof(Marca));
+            }
+
+            if (!string.IsNullOrWhiteSpace(modelo) && modelo != Modelo)
+            {
+                Modelo = modelo;
+                camposActualizados.Add(nameof(Modelo));
+            }
+
+            if (!string.IsNullOrWhiteSpace(color) && color != Color)
+            {
+                Color = color;
+                camposActualizados.Add(nameof(Color));
+            }
+
+            if (fabricacion is not null && fabricacion >= 1995 && fabricacion <= DateTime.Now.Year && fabricacion != Fabricacion)
+            {
+                Fabricacion = fabricacion.Value;
+                camposActualizados.Add(nameof(Fabricacion));
+            }
+
+            if (!string.IsNullOrWhiteSpace(numeroMotor) && numeroMotor != NumeroMotor)
+            {
+                NumeroMotor = numeroMotor;
+                camposActualizados.Add(nameof(NumeroMotor));
+            }
+
+
+            return camposActualizados;
+        }
+
+        public bool EsNumeroMotorValido(string numeroMotor)
+        {
+            return numeroMotor.StartsWith("MTR-") && numeroMotor.Length >= 8;
         }
     }
-
 }

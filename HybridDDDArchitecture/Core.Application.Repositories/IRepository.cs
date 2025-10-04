@@ -14,5 +14,8 @@ namespace Core.Application.Repositories
         Task<TEntity> FindOneAsync(params object[] keyValues);
         void Remove(params object[] keyValues);
         void Update(object id, TEntity entity);
+        IQueryable<TEntity> Query();
+        Task<TEntity> GetByIdAsync(int id);
+        Task DeleteAsync(TEntity entity);
     }
 }

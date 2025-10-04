@@ -1,15 +1,9 @@
-﻿using Application.Repositories;
-using Core.Application;
+﻿using Core.Application;
 using Core.Infraestructure;
-using Domain.Others.Utils;
 using Infrastructure.Constants;
 using Infrastructure.Factories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Client;
-using MongoDB.Bson.Serialization.Conventions;
-using static Domain.Enums.Enums;
 
 namespace Infrastructure.Registrations
 {

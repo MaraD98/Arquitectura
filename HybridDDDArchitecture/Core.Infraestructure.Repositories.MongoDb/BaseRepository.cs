@@ -75,5 +75,21 @@ namespace Core.Infraestructure.Repositories.MongoDb
             FilterDefinition<TEntity> filter = Builders<TEntity>.Filter.Eq("_id", id);
             Collection.ReplaceOne(filter, entity);
         }
+
+        public IQueryable<TEntity> Query()
+        {
+            throw new NotImplementedException("Query() no está implementado para MongoDb.");
+        }
+
+        public Task<TEntity> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException("GetByIdAsync() no está implementado para MongoDb.");
+        }
+
+        public Task DeleteAsync(TEntity entity)
+        {
+            throw new NotImplementedException("DeleteAsync() no está implementado para MongoDb.");
+        }
+
     }
 }
